@@ -11,10 +11,16 @@ function NavBarLinks() {
   ];
 
   const pathname = useLocation().pathname;
+
   return (
     <>
       {navLinks.map(([title, link], index) => (
-        <NavbarLink key={index} href={link} active={pathname === link}>
+        <NavbarLink
+          key={index}
+          href={link}
+          active={pathname === link}
+          style={{ color: pathname === link ? 'blue' : 'black' }}
+        >
           {title}
         </NavbarLink>
       ))}
