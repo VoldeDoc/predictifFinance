@@ -1,5 +1,5 @@
 import Meetups, { ForumMeetupsData, } from "@/components/DashboardComponents/meetups";
-import NewsForum, { MessageBoxForum } from "@/components/DashboardComponents/newsForum";
+// import NewsForum, { MessageBoxForum } from "@/components/DashboardComponents/newsForum";
 import RecentMsg from "@/components/DashboardComponents/recentMsg";
 import { AuthLayout } from "@/components/Layout/layout";
 import { ArrowRightIcon } from "@heroicons/react/24/solid";
@@ -26,7 +26,7 @@ export default function MessageBox() {
 
                 <div className="flex flex-wrap mt-10 space-x-6">
                     <div className=" w-full lg:w-7/12">
-                        <NewsForum forumData={MessageBoxForum} />
+                        {/* <NewsForum forumData={MessageBoxForum} /> */}
 
                         <div className="my-5">
                             <p className="font-semibold">General</p>
