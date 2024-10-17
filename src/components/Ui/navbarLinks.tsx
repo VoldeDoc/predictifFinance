@@ -11,7 +11,6 @@ function NavBarLinks() {
   ];
 
   const pathname = useLocation().pathname;
-
   return (
     <>
       {navLinks.map(([title, link], index) => (
