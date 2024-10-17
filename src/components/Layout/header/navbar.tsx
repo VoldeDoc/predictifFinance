@@ -9,10 +9,10 @@ export default function Header() {
   return (
     <>
       <AdSlider/>
-      <Navbar fluid theme={customNavbarTheme} className="bg-white">
+      <Navbar fluid theme={customNavbarTheme} className="bg-white text-black-500">
         <Navbar.Brand href="/">
           <img src="assets/images/landingPage/favicon.png" className="mr-3 h-8 sm:h-11" alt="Predict.if Logo" />
-          <span className="self-center whitespace-nowrap text-3xl font-bold text-[#002072] dark:text-white">Predict.if</span>
+          <span className="self-center whitespace-nowrap text-3xl font-bold text-[#002072] ">Predict.if</span>
         </Navbar.Brand>
         <div className="flex md:order-2">
           <Link to="/auth/signin"><Button color="dark">Login / Register</Button></Link>
