@@ -16,6 +16,7 @@ import ExampleForm from "./pages/Ui/textinput";
 import Home from "./pages/home/home_page";
 import NotFound from "./pages/home/notFound/notFound";
 import Verification from "./pages/auth/emailVerification";
+import Investment from "./pages/home/investing/investing";
 // import ForumT from "./pages/dashboard/forum";
 // import Message_Box from "./pages/dashboard/message_box";
 // import Forum_groups from "./pages/dashboard/forum_group.tsx";
@@ -44,6 +45,7 @@ function App() {
             <Routes>
               <Route path="*" element={<NotFound />} />
               <Route path="/" element={<Home />} />
+              <Route path="/investing" element={<Investment />} />
 
               {/* Authentication */}
               <Route path="/auth/signin" element={<Signin />} />

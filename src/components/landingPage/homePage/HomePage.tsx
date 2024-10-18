@@ -37,7 +37,7 @@ export default function Home() {
                     {/* Carousel Section */}
                     <div className="w-full sm:w-1/2 h-full">
                         <HomeCarousel />
-                    </div>
+                    </div> 
                 </div>
             </section>
 
