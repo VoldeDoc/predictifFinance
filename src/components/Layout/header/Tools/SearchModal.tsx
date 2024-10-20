@@ -52,17 +52,17 @@ const SearchModal = () => {
     <>
       <div>
         <button
-          className="flex items-center xl:text-sm text-lg  w-full   text-slate-800   p-3 space-x-3"
+          className="w-full block sm:hidden  text-slate-800"
           onClick={openModal}
         >
-
-</button>
+          <BiSearch className="text-xl"/>
+        </button>
         <Button
           icon={BiSearch}
           iconPosition="left"
           onClick={openModal}
-          text="Search here..."
-          className="bg-black-200 text-gray-950 border border-gray-300 rounded-lg px-4 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-left w-full md:w-96"
+          text="Search for stocks and more"
+          className="!bg-[#f7f6f9] !text-gray-400 hidden sm:block rounded-lg px-4 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-left w-full pr-36"
         />
       </div>
 
@@ -128,10 +128,11 @@ const SearchModal = () => {
                           <Combobox.Option key={i}>
                             {({ active }) => (
                               <div
-                                className={`px-4 text-[15px] font-normal capitalize py-2 ${active
+                                className={`px-4 text-[15px] font-normal capitalize py-2 ${
+                                  active
                                     ? "bg-slate-900 dark:bg-slate-600 dark:bg-opacity-60 text-white"
                                     : "text-slate-900 dark:text-white"
-                                  }`}
+                                }`}
                               >
                                 <span>{item.name}</span>
                               </div>

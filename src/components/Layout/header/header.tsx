@@ -57,10 +57,10 @@ export const Header = ({ showNav, setShowNav }: Props) => {
           <div className="hidden font-bold text-4xl">Dashboard</div>
         </div>
 
-        <div className=" ">
-          <SearchModal />
-        </div>
         <li className="flex items-center gap-5 md:gap-8">
+        {/* <div className=" "> */}
+          <SearchModal />
+        {/* </div> */}
           <Popover className={"relative"}>
             <Popover.Button
               className={"outline-none cursor-pointer text-gray-700"}

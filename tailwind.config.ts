@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import flowbite from "flowbite-react/tailwind";
-/** @type {import('tailwindcss').Config} */
+import type { Config } from "tailwindcss";
 
-export default {
+const config: Config = {
   content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
@@ -141,7 +142,9 @@ export default {
   },
   plugins: [
     flowbite.plugin(),
-    function ({ addBase, theme }) {
+    function ({ addBase, theme }: {
+      addBase: any; theme: any
+    }) {
       addBase({
         h1: { fontSize: theme('fontSize.2xl') || '1.5rem', fontWeight: theme('fontWeight.bold') || '700' },
         h2: { fontSize: theme('fontSize.xl') || '1.25rem', fontWeight: theme('fontWeight.bold') || '700' },
@@ -153,3 +156,5 @@ export default {
     },
   ],
 };
+
+export default config;

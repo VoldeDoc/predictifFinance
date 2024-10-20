@@ -2,7 +2,7 @@ import { customNavbarTheme } from "@/utils/FlowBiteCustomThemes";
 import NavBarLinks from "@/components/Ui/navbarLinks";
 import { Button, Navbar } from "flowbite-react";
 import { Link } from "react-router-dom";
-import AdSlider from "./adSlider";
+import AdSlider from "./Tools/adSlider";
 
 export default function Header() {
   return (
