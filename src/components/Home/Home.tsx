@@ -1,5 +1,5 @@
 import LandingPageLayout from "@/components/Layout/LandingPageLayout";
-import HomeCarousel from "./Tool/HeroCarousel";
+import HomeCarousel from "./Tools/HeroCarousel";
 import CompanyBrand from "@/components/Ui/companyBrand";
 import { useState } from "react";
 // import BrandCarousel from "../tool/brandCarousel";

@@ -1,5 +1,5 @@
 import LandingPageLayout from "@/components/Layout/LandingPageLayout";
-import HomeCarousel from "../Home/Tool/HeroCarousel";
+import HomeCarousel from "../Home/Tools/HeroCarousel";
 import CompanyBrand from "@/components/Ui/companyBrand";
 import { ArrowRightIcon, ArrowTrendingUpIcon } from "@heroicons/react/24/solid";
 import { FaRocket } from "react-icons/fa6";
