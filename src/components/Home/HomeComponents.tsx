@@ -1,10 +1,10 @@
 import HomeCarousel from "@/components/Home/tools/HeroCarousel";
-import Layout from "../Layout/layout";
 import BrandCarousel from "./tools/BrandCarousel";
+import LandingPageLayout from "../Layout/LandingPageLayout";
 
 function HomeComponents() {
   return (
-    <Layout>
+    <LandingPageLayout>
       <section className="mt-3 container">
         <div className="flex flex-col gap-10 items-center sm:flex-row sm:h-[35rem] h-[45rem]">
           {/* Text Section */}
@@ -335,7 +335,7 @@ function HomeComponents() {
           </div>
         </section>
       </section>
-    </Layout>
+    </LandingPageLayout>
   );
 }
 
