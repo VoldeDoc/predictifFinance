@@ -19,7 +19,7 @@ export function generateRandomData(length: number, digits?: number): number[] {
 const StockCardCarousel = () => {
   const stockData = [
     {
-      img: "/img/nvidia.png",
+      img: "assets/images/stocks/nvidia.png",
       name: "Nvidia",
       ticker: "NVDA",
       price: "$203.65",
@@ -28,7 +28,7 @@ const StockCardCarousel = () => {
       bgColor: "bg-[#a6f7e2]",
     },
     {
-      img: "/img/meta.png",
+      img: "assets/images/stocks/meta.png",
       name: "Meta",
       ticker: "META",
       price: "$151.74",
@@ -39,7 +39,7 @@ const StockCardCarousel = () => {
       chartColor: "#ffffff",
     },
     {
-      img: "/img/tesla.png",
+      img: "assets/images/stocks/tesla.png",
       name: "Tesla Inc",
       ticker: "TSLA",
       price: "$177.90",
@@ -48,7 +48,7 @@ const StockCardCarousel = () => {
       bgColor: "bg-yellow-200",
     },
     {
-      img: "/img/apple.png",
+      img: "assets/images/stocks/apple.png",
       name: "Apple Inc",
       ticker: "AAPL",
       price: "$145.93",
@@ -57,7 +57,7 @@ const StockCardCarousel = () => {
       bgColor: "bg-[#c7ffa5]",
     },
     {
-      img: "/img/amd.png",
+      img: "assets/images/stocks/amd.png",
       name: "Advanced Micro Devices, Inc.",
       ticker: "AMD",
       price: "$75.40",

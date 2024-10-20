@@ -11,5 +11,4 @@ export { default as google } from "/assets/images/auth/google.png";
 
 // dashboard
 export { default as user } from "/assets/images/dashboard/dashboard/user.png";
-export { default as medal } from "/assets/images/dashboard/dashboard/medal.png";
-export { default as dot } from "/assets/images/dashboard/dashboard/dot.png";
+export { default as bulb } from "/assets/images/dashboard/dashboard/bulb.png";

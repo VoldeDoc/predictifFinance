@@ -13,7 +13,7 @@ function Footer() {
       <div className="container mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 px-6 mt-32">
         <div className="col-span-1">
           <img
-            src="assets/images/landingPage/logo-white.png"
+            src="assets/images/logo-white.png"
             alt="Predict.if logo"
             className="w-52 mb-4"
           />

@@ -5,7 +5,7 @@ function generateChart(color: string | string[]): ApexOptions {
   return {
     chart: {
       toolbar: {
-        show: false, // Hide the toolbar
+        show: true, // Hide the toolbar
       },
     },
     colors: Array.isArray(color) ? color : [color], // Set the color of the chart

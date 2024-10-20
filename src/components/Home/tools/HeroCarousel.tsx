@@ -6,15 +6,15 @@ export default function HomeCarousel() {
 
     const carouselItems = [
         {
-            img: "/img/man.png",
+            img: "assets/images/landingPage/man.png",
             alt: "Man"
         },
         {
-            img: "/img/man.png",
+            img: "assets/images/landingPage/man.png",
             alt: "Man"
         },
         {
-            img: "/img/man.png",
+            img: "assets/images/landingPage/man.png",
             alt: "Man"
         },
     ];

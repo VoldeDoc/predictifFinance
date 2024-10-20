@@ -1,5 +1,5 @@
 import { AuthLayout } from "../Layout/layout";
-import BalanceSummary from "./Tools/Balance";
+import FinancialOverview from "./Tools/FinancialOverview";
 import PortfolioAnalyticsWatchList from "./Tools/PortfolioAnalyticsWatchList";
 import StockCardCarousel from "./Tools/StockCardCarousel";
 
@@ -9,7 +9,7 @@ const Dashboard = () => {
       <>
         <div className="container">
           <StockCardCarousel />
-          <BalanceSummary />
+          <FinancialOverview />
           <PortfolioAnalyticsWatchList />
         </div>
       </>

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import flowbite from "flowbite-react/tailwind";
 import type { Config } from "tailwindcss";
 
@@ -25,9 +24,6 @@ const config: Config = {
           100: "#F4F5F7",
           DEFAULT: "#97060B",
         },
-
-
-
         danger: {
           50: "#FFF7F7",
           100: "#FEEFEF",
@@ -142,9 +138,7 @@ const config: Config = {
   },
   plugins: [
     flowbite.plugin(),
-    function ({ addBase, theme }: {
-      addBase: any; theme: any
-    }) {
+    function ({ addBase, theme }: { addBase: any; theme: any }) {
       addBase({
         h1: { fontSize: theme('fontSize.2xl') || '1.5rem', fontWeight: theme('fontWeight.bold') || '700' },
         h2: { fontSize: theme('fontSize.xl') || '1.25rem', fontWeight: theme('fontWeight.bold') || '700' },

@@ -1,8 +1,7 @@
 import { Link } from "react-router-dom";
-import BrandCarousel from "../landingPage/tool/brandCarousel";
-// import BrandCarousel from "../Home/tools/BrandCarousel";
+import BrandCarousel from "../Home/Tools/BrandCarousel";
 
-export default function VerificationComponent() {
+export default function EmailVerification() {
   return (
     <div className="min-h-screen flex flex-col sm:flex-row">
       {/* Left Section (Form) */}
@@ -10,7 +9,7 @@ export default function VerificationComponent() {
         <div className="w-full max-w-md">
           {/* Logo */}
           <img
-           src="/assets/images/landingPage/logo.png"
+            src="/assets/images/logo.png"
             alt="Predict.if Logo"
             className="w-60 mx-auto mb-24"
           />
@@ -59,7 +58,7 @@ export default function VerificationComponent() {
       </div>
 
       <div className="bg-blue-800 w-full sm:w-1/2 flex flex-col justify-center items-center p-10">
-      <p className="text-white  mb-6 text-center text-xl">
+        <p className="text-white  mb-6 text-center text-xl">
           Join the world's top
         </p>
         <p className="text-white text-xl mb-6 text-center">
@@ -71,7 +70,7 @@ export default function VerificationComponent() {
           <div className="flex-grow border-t border-white"></div>
         </div>
 
-        <BrandCarousel/>
+        <BrandCarousel />
       </div>
     </div>
   );

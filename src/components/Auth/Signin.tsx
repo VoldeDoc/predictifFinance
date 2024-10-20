@@ -1,6 +1,6 @@
 import { FaEye } from "react-icons/fa6";
 import { Link } from "react-router-dom";
-import BrandCarousel from "../landingPage/tool/brandCarousel";
+import BrandCarousel from "../Home/Tools/BrandCarousel";
 // import BrandCarousel from "../Home/tools/BrandCarousel";
 
 export default function SigninComponent() {
@@ -11,10 +11,11 @@ export default function SigninComponent() {
         <div className="w-full max-w-md">
           {/* Logo */}
           <img
-            src="/assets/images/landingPage/logo.png"
+            src="/assets/images/logo.png"
             alt="Predict.if Logo"
             className="w-60 mx-auto mb-20"
           />
+          
           {/* Welcome Text */}
           <h1 className="text-4xl font-semibold text-center mb-10">
             Welcome back!
@@ -38,7 +39,10 @@ export default function SigninComponent() {
           </div>
           {/* Forgot Password */}
           <div className="flex justify-end mb-4">
-            <Link to="#" className="text-blue-900 font-bold">
+            <Link
+              to="/auth/forget-password"
+              className="text-blue-900 font-bold"
+            >
               Forgot your password?
             </Link>
           </div>
@@ -71,7 +75,7 @@ export default function SigninComponent() {
       </div>
 
       <div className="bg-blue-500 w-full sm:w-1/2 flex flex-col justify-center items-center p-10">
-      <p className="text-white  mb-6 text-center text-xl">
+        <p className="text-white  mb-6 text-center text-xl">
           Join the world's top
         </p>
         <p className="text-white text-xl mb-6 text-center">
@@ -83,7 +87,7 @@ export default function SigninComponent() {
           <div className="flex-grow border-t border-white"></div>
         </div>
 
-        <BrandCarousel/>
+        <BrandCarousel />
       </div>
     </div>
   );

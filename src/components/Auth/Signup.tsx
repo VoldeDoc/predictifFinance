@@ -1,6 +1,6 @@
 import { FaEye } from "react-icons/fa6";
 import { Link } from "react-router-dom";
-import BrandCarousel from "../landingPage/tool/brandCarousel";
+import BrandCarousel from "../Home/Tools/BrandCarousel";
 // import BrandCarousel from "../Home/tools/BrandCarousel";
 
 export default function SignupComponent() {
@@ -11,7 +11,7 @@ export default function SignupComponent() {
         <div className="w-full max-w-md">
           {/* Logo */}
           <img
-            src="/assets/images/landingPage/logo.png"
+            src="/assets/images/logo.png"
             alt="Predict.if Logo"
             className="w-60 mx-auto mb-20"
           />
@@ -105,7 +105,7 @@ export default function SignupComponent() {
           <div className="flex-grow border-t border-white"></div>
         </div>
 
-        <BrandCarousel/>
+        <BrandCarousel />
       </div>
     </div>
   );

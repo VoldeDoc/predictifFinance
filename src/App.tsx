@@ -8,10 +8,10 @@ import Signup from "@/pages/auth/signup";
 import ButtonT from "@/pages/Ui/button";
 import ExampleForm from "./pages/Ui/textinput";
 
-import Home from "@/pages/home/home_page";
-import NotFound from "@/pages/home/notFound/notFound";
+import Home from "@/pages/home/";
+import NotFound from "@/pages/404";
 import Verification from "@/pages/auth/emailVerification";
-import Investment from "@/pages/home/investing/investing";
+import Investment from "@/pages/investing";
 import Dashboard_T from "@/pages/dashboard";
 
 
@@ -39,7 +39,6 @@ function App() {
             <Routes>
               <Route path="*" element={<NotFound />} />
               <Route path="/" element={<Home />} />
-              <Route path="/investing" element={<Investment />} />
 
               {/* Authentication */}
               <Route path="/auth/signin" element={<Signin />} />
@@ -47,8 +46,9 @@ function App() {
               <Route path="/auth/otp-verification" element={<Verification />} />
               
 
-              {/* Dashboard */}
+              {/* Auth Pages */}
               <Route path="/dashboard" element={<Dashboard_T />} />
+              <Route path="/investing" element={<Investment />} />
 
               {/* Ui */}
               <Route path="/ui/button" element={<ButtonT />} />

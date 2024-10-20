@@ -5,35 +5,35 @@ import { FaPlus } from "react-icons/fa6";
 const PortfolioAnalyticsWatchList = () => {
   const stocks = [
     {
-      img: "/img/amazon.png",
+      img: "assets/images/stocks/amazon.png",
       name: "Amazon.com, Inc.",
       symbol: "AMZN",
       price: 102.24,
       change: +3.02,
     },
     {
-      img: "/img/cocacola.png",
+      img: "assets/images/stocks/cocacola.png",
       name: "Coca-Cola Co",
       symbol: "KO",
       price: 60.49,
       change: -0.32,
     },
     {
-      img: "/img/bmw.png",
+      img: "assets/images/stocks/bmw.png",
       name: "Bayerische Motoren Werke AG",
       symbol: "BMW",
       price: 92.94,
       change: +0.59,
     },
     {
-      img: "/img/microsoft.png",
+      img: "assets/images/stocks/microsoft.png",
       name: "Microsoft Corp",
       symbol: "MSFT",
       price: 248.16,
       change: +0.16,
     },
     {
-      img: "/img/ups.png",
+      img: "assets/images/stocks/ups.png",
       name: "United Parcel Service, Inc.",
       symbol: "UPS",
       price: 182.09,
