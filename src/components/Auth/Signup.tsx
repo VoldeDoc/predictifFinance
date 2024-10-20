@@ -1,7 +1,6 @@
 import { FaEye } from "react-icons/fa6";
 import { Link } from "react-router-dom";
-import BrandCarousel from "../Home/Tools/BrandCarousel";
-// import BrandCarousel from "../Home/tools/BrandCarousel";
+import BrandCarousel from "../Home/Tool/BrandCarousel";
 
 export default function SignupComponent() {
   return (

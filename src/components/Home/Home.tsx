@@ -1,5 +1,5 @@
 import LandingPageLayout from "@/components/Layout/LandingPageLayout";
-import HomeCarousel from "./Tools/HeroCarousel";
+import HomeCarousel from "./Tool/HeroCarousel";
 import CompanyBrand from "@/components/Ui/companyBrand";
 import { useState } from "react";
 // import BrandCarousel from "../tool/brandCarousel";
@@ -246,17 +246,11 @@ export default function Home() {
           </span>
 
           <span className="bg-[#0c21c1] dark:bg-black col-xl-6 flex justify-center">
-            {/* <video
-              src="/assets/images/earth.mp4"
-              autoPlay
-              loop
-              muted
-              playsInline
+            <img
+              src="assets/images/landingPage/earth.gif"
+              alt="Earth"
               className="h-auto w-full object-cover"
-            >
-              Your browser does not support the video tag.
-            </video> */}
-              <img src="assets/images/landingPage/earth.gif" alt="Earth" className="h-auto w-full object-cover"/>
+            />
           </span>
         </div>
       </section>

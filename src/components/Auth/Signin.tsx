@@ -1,7 +1,6 @@
 import { FaEye } from "react-icons/fa6";
 import { Link } from "react-router-dom";
-import BrandCarousel from "../Home/Tools/BrandCarousel";
-// import BrandCarousel from "../Home/tools/BrandCarousel";
+import BrandCarousel from "../Home/Tool/BrandCarousel";
 
 export default function SigninComponent() {
   return (
@@ -15,7 +14,7 @@ export default function SigninComponent() {
             alt="Predict.if Logo"
             className="w-60 mx-auto mb-20"
           />
-          
+
           {/* Welcome Text */}
           <h1 className="text-4xl font-semibold text-center mb-10">
             Welcome back!

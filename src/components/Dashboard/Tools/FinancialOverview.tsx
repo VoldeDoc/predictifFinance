@@ -1,4 +1,4 @@
-import { CustomFlowbiteTheme, Tabs } from "flowbite-react";
+import { Tabs } from "flowbite-react";
 import { FaChevronRight } from "react-icons/fa6";
 import { StockAreaChart } from "@/components/Chart/StockAreaChart";
 import { generateRandomData } from "./StockCardCarousel";

@@ -1,4 +1,4 @@
-import EmailVerification from "@/components/Auth/EmailVerification";
+import EmailVerification from "@/components/Auth/mailVerification";
 
 const Verification = () => {
   return (

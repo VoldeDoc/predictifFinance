@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import BrandCarousel from "../Home/Tools/BrandCarousel";
+import BrandCarousel from "../Home/Tool/BrandCarousel";
 
 export default function EmailVerification() {
   return (
