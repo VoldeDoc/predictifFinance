@@ -52,9 +52,9 @@ const PortfolioAnalyticsWatchList = () => {
   return (
     <div className="row justify-center gap-5 container mt-10">
       <div className="col-xxl-8 bg-white rounded-lg p-5 shadow-lg">
-        <div className="flex justify-between">
+        <div className="flex flex-col sm:flex-row justify-between gap-5">
           <h1 className="text-lg font-bold">Portfolio Analytics</h1>
-          <div className="flex gap-8 mb-4">
+          <div className="flex gap-8 flex-wrap mb-4">
             <button className="text-[#6425fe] text-xl border-b-2 border-black-500">1D</button>
             <span className="text-gray-400 text-2xl"> | </span>
             <button className="text-gray-400 text-xl">5D</button>

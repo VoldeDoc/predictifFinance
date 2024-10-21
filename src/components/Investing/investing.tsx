@@ -1,4 +1,4 @@
-import LandingPageLayout from "@/components/Layout/LandingPageLayout";
+import MainLayout from "@/components/Layout/MainLayout";
 import HomeCarousel from "../Home/Tools/HeroCarousel";
 import CompanyBrand from "@/components/Ui/companyBrand";
 import { ArrowRightIcon, ArrowTrendingUpIcon } from "@heroicons/react/24/solid";
@@ -8,11 +8,11 @@ import { BiLockOpenAlt } from "react-icons/bi";
 export default function Investing() {
   return (
     <>
-      <LandingPageLayout>
-        <section className="mt-3 container">
+      <MainLayout>
+        <section className="mt-3 ">
           <div className="flex flex-col gap-10 items-center sm:flex-row sm:h-[35rem] h-[45rem]">
             {/* Text Section */}
-            <div className="w-full sm:w-1/2 text-center sm:text-left">
+            <div className="w-full sm:w-1/2 text-center sm:text-left container">
               <p className="text-3xl sm:text-4xl font-light">Experience AI</p>
               <h1 className="font-bold text-4xl sm:text-5xl mt-2">
                 For Accurate Financial
@@ -35,71 +35,73 @@ export default function Investing() {
           </div>
         </section>
 
-        <section className="bg-gray-200 my-9 py-9 space-y-5">
-          <div className="container mx-auto px-6">
-            <div className="flex flex-col sm:flex-row items-center">
-              <p className="!mt-10 text-center sm:text-start sm:w-1/4 text-lg font-semibold">
-                Trusted by thousands
-                <span>of companies worldwide</span>
-              </p>
-              <span className="sm:w-3/4">
-                <CompanyBrand />
-              </span>
+        <section className="container-fluid">
+          <section className="bg-gray-200 my-9 py-9 space-y-5">
+            <div className="container mx-auto px-6">
+              <div className="row items-center">
+                <p className="!mt-10 text-center sm:text-start sm:w-1/4 text-lg font-semibold">
+                  Trusted by thousands
+                  <span> of companies worldwide</span>
+                </p>
+                <span className="sm:w-3/4">
+                  <CompanyBrand />
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 my-10">
+                <div className="bg-blue-900 rounded-lg px-6 py-3 text-white shadow-lg">
+                  <p className="py-7 font-bold">Classify</p>
+                  <p>
+                    Sort financial documents with precision using machine
+                    learning.
+                  </p>
+                  <div className="flex space-x-5 py-5">
+                    <p>Learn more</p>
+                    <ArrowRightIcon className="w-5" />
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-lg px-6 py-3 text-gray-700 shadow-lg">
+                  <p className="py-7 text-blue-900 font-bold">Capture</p>
+                  <p>
+                    Sort financial documents with precision using machine
+                    learning.
+                  </p>
+                  <div className="flex space-x-5 py-5">
+                    <p>Learn more</p>
+                    <ArrowRightIcon className="w-5" />
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-lg px-6 py-3 text-gray-700 shadow-lg">
+                  <p className="py-6 font-bold text-blue-900">Analyze</p>
+                  <p>
+                    Identify suspicious activity with tampering detection and
+                    validation.
+                  </p>
+                  <div className="flex space-x-5 py-5">
+                    <p>Learn more</p>
+                    <ArrowRightIcon className="w-5" />
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-lg px-6 py-3 text-gray-700 shadow-lg">
+                  <p className="py-6 font-bold text-blue-900">Detect</p>
+                  <p>
+                    Identify suspicious activity with tampering detection and
+                    validation.
+                  </p>
+                  <div className="flex space-x-5 py-5">
+                    <p>Learn more</p>
+                    <ArrowRightIcon className="w-5" />
+                  </div>
+                </div>
+              </div>
             </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 my-10">
-              <div className="bg-blue-900 rounded-lg px-6 py-3 text-white shadow-lg">
-                <p className="py-7 font-bold">Classify</p>
-                <p>
-                  Sort financial documents with precision using machine
-                  learning.
-                </p>
-                <div className="flex space-x-5 py-5">
-                  <p>Learn more</p>
-                  <ArrowRightIcon className="w-5" />
-                </div>
-              </div>
-
-              <div className="bg-white rounded-lg px-6 py-3 text-gray-700 shadow-lg">
-                <p className="py-7 text-blue-900 font-bold">Capture</p>
-                <p>
-                  Sort financial documents with precision using machine
-                  learning.
-                </p>
-                <div className="flex space-x-5 py-5">
-                  <p>Learn more</p>
-                  <ArrowRightIcon className="w-5" />
-                </div>
-              </div>
-
-              <div className="bg-white rounded-lg px-6 py-3 text-gray-700 shadow-lg">
-                <p className="py-6 font-bold text-blue-900">Analyze</p>
-                <p>
-                  Identify suspicious activity with tampering detection and
-                  validation.
-                </p>
-                <div className="flex space-x-5 py-5">
-                  <p>Learn more</p>
-                  <ArrowRightIcon className="w-5" />
-                </div>
-              </div>
-
-              <div className="bg-white rounded-lg px-6 py-3 text-gray-700 shadow-lg">
-                <p className="py-6 font-bold text-blue-900">Detect</p>
-                <p>
-                  Identify suspicious activity with tampering detection and
-                  validation.
-                </p>
-                <div className="flex space-x-5 py-5">
-                  <p>Learn more</p>
-                  <ArrowRightIcon className="w-5" />
-                </div>
-              </div>
-            </div>
-          </div>
+          </section>
         </section>
 
-        <section className="container-fluid my-10">
+        <section className="container my-10">
           <div className="row">
             <div className="col-lg-6 pt-20">
               <h1 className="text-xl font-bold">YOUR ADVANTAGE</h1>
@@ -160,7 +162,7 @@ export default function Investing() {
         </section>
 
         <section className="my-20">
-          <div className="container-fluid">
+          <div className="container">
             <div className="row">
               <div className="col-lg-6">
                 <div className="bg-[#0C21C140] px-5 pt-14 pb-14">
@@ -227,22 +229,23 @@ export default function Investing() {
         </section>
 
         <section>
-          <section className="container my-20 bg-[#e0e1e4] px-7 py-7">
+          <section className="container my-20">
             <h2 className="text-4xl text-[#0C21C1] font-bold mb-10">
               Top Finance Blogs
             </h2>
             <div className="flex flex-col sm:flex-row items-stretch">
               <div className="w-full sm:w-1/2 bg-[#ebeef3] p-6 rounded-lg">
                 <h2 className="text-2xl font-bold mb-4">Trending News</h2>
-                <div className="flex gap-4 mb-6">
-                  <div className="w-[32%]">
+
+                <div className="flex flex-col sm:flex-row gap-4 mb-6">
+                  <div className="w-full sm:w-[32%]">
                     <img
                       src="assets/images/landingPage/race-horse.png"
                       alt="Race"
-                      className="w-48 h-32 object-cover rounded-lg"
+                      className="w-full h-32 object-cover rounded-lg"
                     />
                   </div>
-                  <div className="w-[68%]">
+                  <div className="w-full sm:w-[68%]">
                     <span className="text-sm text-gray-500">
                       Race98 - 03 June 2023
                     </span>
@@ -256,15 +259,15 @@ export default function Investing() {
                   </div>
                 </div>
 
-                <div className="flex gap-4 mb-6">
-                  <div className="w-[32%]">
+                <div className="flex flex-col sm:flex-row gap-4 mb-6">
+                  <div className="w-full sm:w-[32%]">
                     <img
                       src="assets/images/landingPage/cyclist.png"
                       alt="Cyclist"
-                      className="w-48 h-32 object-cover rounded-lg"
+                      className="w-full h-32 object-cover rounded-lg"
                     />
                   </div>
-                  <div className="w-[68%]">
+                  <div className="w-full sm:w-[68%]">
                     <span className="text-sm text-gray-500">
                       Cycling - 03 June 2023
                     </span>
@@ -278,15 +281,15 @@ export default function Investing() {
                   </div>
                 </div>
 
-                <div className="flex gap-4 mb-6">
-                  <div className="w-[32%]">
+                <div className="flex flex-col sm:flex-row gap-4 mb-6">
+                  <div className="w-full sm:w-[32%]">
                     <img
                       src="assets/images/landingPage/boxing-arena.png"
                       alt="boxing-arena"
-                      className="w-48 h-32 object-cover rounded-lg truncate"
+                      className="w-full h-32 object-cover rounded-lg"
                     />
                   </div>
-                  <div className="w-[68%]">
+                  <div className="w-full sm:w-[68%]">
                     <span className="text-sm text-gray-500">
                       Boxing - 03 June 2023
                     </span>
@@ -305,18 +308,17 @@ export default function Investing() {
                 <img
                   src="assets/images/landingPage/sportsman.png"
                   alt="Feature"
-                  className="w-auto object-cover"
+                  className="w-full h-auto object-cover rounded-lg"
                 />
-                <div className="absolute inset-0 bg-black opacity-100"></div>{" "}
-                {/* Adjusted opacity */}
-                <span className="py-1 px-3 text-2xl border text-white absolute top-2 left-7 rounded">
+                <div className="absolute inset-0 bg-black-800 opacity-50"></div>
+                <span className="py-1 px-3 text-2xl border text-white absolute top-2 left-2 sm:left-7 rounded">
                   Cycling
                 </span>
-                <div className="absolute bottom-8 left-8 text-white">
+                <div className="absolute bottom-4 left-2 sm:bottom-8 sm:left-8 text-white">
                   <span className="block text-lg mt-2">
                     Debits - 03 June 2023
                   </span>
-                  <h3 className="text-3xl font-bold mt-2 uppercase">
+                  <h3 className="text-2xl sm:text-3xl font-bold mt-2 uppercase">
                     Discover the Member Benefits of USA Cycling!
                   </h3>
                 </div>
@@ -324,7 +326,7 @@ export default function Investing() {
             </div>
           </section>
         </section>
-      </LandingPageLayout>
+      </MainLayout>
     </>
   );
 }

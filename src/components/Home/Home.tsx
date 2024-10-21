@@ -1,4 +1,4 @@
-import LandingPageLayout from "@/components/Layout/LandingPageLayout";
+import MainLayout from "@/components/Layout/MainLayout";
 import HomeCarousel from "./Tools/HeroCarousel";
 import CompanyBrand from "@/components/Ui/companyBrand";
 import { useState } from "react";
@@ -14,7 +14,7 @@ export default function Home() {
     setBgColor(colors[nextColorIndex]);
   };
   return (
-    <LandingPageLayout>
+    <MainLayout>
       <section className="mt-3 ">
         <div className="flex flex-col gap-10 items-center sm:flex-row sm:h-[35rem] h-[45rem]">
           {/* Text Section */}
@@ -263,15 +263,16 @@ export default function Home() {
           <div className="flex flex-col sm:flex-row items-stretch">
             <div className="w-full sm:w-1/2 bg-[#ebeef3] p-6 rounded-lg">
               <h2 className="text-2xl font-bold mb-4">Trending News</h2>
-              <div className="flex gap-4 mb-6">
-                <div className="w-[32%]">
+
+              <div className="flex flex-col sm:flex-row gap-4 mb-6">
+                <div className="w-full sm:w-[32%]">
                   <img
                     src="assets/images/landingPage/race-horse.png"
                     alt="Race"
-                    className="w-48 h-32 object-cover rounded-lg"
+                    className="w-full h-32 object-cover rounded-lg"
                   />
                 </div>
-                <div className="w-[68%]">
+                <div className="w-full sm:w-[68%]">
                   <span className="text-sm text-gray-500">
                     Race98 - 03 June 2023
                   </span>
@@ -285,15 +286,15 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="flex gap-4 mb-6">
-                <div className="w-[32%]">
+              <div className="flex flex-col sm:flex-row gap-4 mb-6">
+                <div className="w-full sm:w-[32%]">
                   <img
                     src="assets/images/landingPage/cyclist.png"
                     alt="Cyclist"
-                    className="w-48 h-32 object-cover rounded-lg"
+                    className="w-full h-32 object-cover rounded-lg"
                   />
                 </div>
-                <div className="w-[68%]">
+                <div className="w-full sm:w-[68%]">
                   <span className="text-sm text-gray-500">
                     Cycling - 03 June 2023
                   </span>
@@ -307,15 +308,15 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="flex gap-4 mb-6">
-                <div className="w-[32%]">
+              <div className="flex flex-col sm:flex-row gap-4 mb-6">
+                <div className="w-full sm:w-[32%]">
                   <img
                     src="assets/images/landingPage/boxing-arena.png"
                     alt="boxing-arena"
-                    className="w-48 h-32 object-cover rounded-lg truncate"
+                    className="w-full h-32 object-cover rounded-lg"
                   />
                 </div>
-                <div className="w-[68%]">
+                <div className="w-full sm:w-[68%]">
                   <span className="text-sm text-gray-500">
                     Boxing - 03 June 2023
                   </span>
@@ -334,17 +335,17 @@ export default function Home() {
               <img
                 src="assets/images/landingPage/sportsman.png"
                 alt="Feature"
-                className="w-auto object-cover"
+                className="w-full h-auto object-cover rounded-lg"
               />
-              <div className="absolute inset-0 bg-black-900 opacity-50"></div>
-              <span className="py-1 px-3 text-2xl border text-white absolute top-2 left-7 rounded">
+              <div className="absolute inset-0 bg-black-800 opacity-50"></div>
+              <span className="py-1 px-3 text-2xl border text-white absolute top-2 left-2 sm:left-7 rounded">
                 Cycling
               </span>
-              <div className="absolute bottom-8 left-8 text-white">
+              <div className="absolute bottom-4 left-2 sm:bottom-8 sm:left-8 text-white">
                 <span className="block text-lg mt-2">
                   Debits - 03 June 2023
                 </span>
-                <h3 className="text-3xl font-bold mt-2 uppercase">
+                <h3 className="text-2xl sm:text-3xl font-bold mt-2 uppercase">
                   Discover the Member Benefits of USA Cycling!
                 </h3>
               </div>
@@ -352,6 +353,6 @@ export default function Home() {
           </div>
         </section>
       </section>
-    </LandingPageLayout>
+    </MainLayout>
   );
 }

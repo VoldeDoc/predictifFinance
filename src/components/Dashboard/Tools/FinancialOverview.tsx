@@ -92,7 +92,7 @@ const FinancialOverview = () => {
       <div className="col-xxl-5 bg-white rounded-lg p-6 shadow-lg">
         <Tabs aria-label="Pills" variant="pills" theme={customPillsTabTheme}>
           <Tabs.Item active title="NASDAQ">
-            <div className="flex gap-8 mb-4">
+            <div className="flex gap-8 mb-4 flex-wrap">
               <button className="text-[#6425fe] text-xl">1D</button>
               <span className="text-gray-400 text-2xl"> | </span>
               <button className="text-gray-400 text-xl">5D</button>
@@ -128,7 +128,7 @@ const FinancialOverview = () => {
             </div>
           </Tabs.Item>
           <Tabs.Item title="SSE">
-            <div className="flex gap-8 mb-4">
+            <div className="flex gap-8 mb-4 flex-wrap">
               <button className="text-[#6425fe] text-xl">1D</button>
               <span className="text-gray-400 text-2xl"> | </span>
               <button className="text-gray-400 text-xl">5D</button>
@@ -164,7 +164,7 @@ const FinancialOverview = () => {
             </div>
           </Tabs.Item>
           <Tabs.Item title="Euronext">
-            <div className="flex gap-8 mb-4">
+            <div className="flex gap-8 mb-4 flex-wrap">
               <button className="text-[#6425fe] text-xl">1D</button>
               <span className="text-gray-400 text-2xl"> | </span>
               <button className="text-gray-400 text-xl">5D</button>
@@ -200,7 +200,7 @@ const FinancialOverview = () => {
             </div>
           </Tabs.Item>
           <Tabs.Item title="BSE">
-            <div className="flex gap-8 mb-4">
+            <div className="flex gap-8 mb-4 flex-wrap">
               <button className="text-[#6425fe] text-xl">1D</button>
               <span className="text-gray-400 text-2xl"> | </span>
               <button className="text-gray-400 text-xl">5D</button>

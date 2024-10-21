@@ -13,6 +13,8 @@ import NotFound from "@/pages/404";
 import Verification from "@/pages/auth/emailVerification";
 import Investment from "@/pages/investing";
 import Dashboard_T from "@/pages/dashboard";
+import Stocking from "@/pages/stock";
+import Market from "@/pages/marketzone";
 
 
 function App() {
@@ -49,6 +51,8 @@ function App() {
               {/* Auth Pages */}
               <Route path="/dashboard" element={<Dashboard_T />} />
               <Route path="/investing" element={<Investment />} />
+              <Route path="/stock" element={<Stocking />} />
+              <Route path="/market-zone" element={<Market />} />
 
               {/* Ui */}
               <Route path="/ui/button" element={<ButtonT />} />
