@@ -1,0 +1,38 @@
+.form-label {
+    @apply mb-2 text-slate-600  text-sm leading-6 capitalize cursor-pointer block w-full font-medium rtl:text-right rtl:block;
+  }
+  
+  .form-control {
+    @apply bg-white transition duration-300 ease-in-out border border-slate-200  focus:ring-1 focus:ring-slate-600 focus:outline-none focus:ring-opacity-90 rounded placeholder:text-slate-400 text-slate-900 text-sm px-3 placeholder:font-normal  block w-full;
+  }
+  
+  .input-description {
+    @apply block text-secondary font-light leading-4 text-xs mt-2;
+  }
+  
+  .formGroup {
+    @apply relative;
+  }
+  .formGroup.has-error .form-control {
+    @apply border-danger-500 focus:ring-danger-500 focus:ring-opacity-90 focus:ring-1;
+  }
+  .formGroup.is-valid .form-control {
+    @apply border-success-500 focus:ring-success-500 focus:ring-opacity-90 focus:ring-1;
+  }
+  
+  .form-control[readonly] {
+    @apply bg-slate-200 text-slate-400 cursor-pointer placeholder:text-slate-400;
+  }
+  
+  .form-control[disabled] {
+    @apply cursor-not-allowed bg-slate-50 text-slate-800 placeholder:text-opacity-60 ;
+  }
+  
+  .file-control {
+    @apply bg-transparent transition duration-300 ease-in-out border border-slate-200  focus:ring-1 focus:ring-slate-900  focus:outline-none focus:ring-opacity-90 rounded text-sm ltr:pl-3 rtl:pr-3 placeholder:font-normal;
+  }
+  
+  .badge-title {
+    @apply bg-slate-900 text-white px-2 py-[3px] rounded text-sm;
+  }
+  

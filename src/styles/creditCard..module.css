@@ -1,0 +1,20 @@
+.creditCardContainer {
+    perspective: 1000px;
+  }
+  
+  .creditCard {
+    transition: transform 0.8s;
+    transform-style: preserve-3d;
+  }
+  
+  .flipped {
+    transform: rotateY(180deg);
+  }
+  
+  .cardFace {
+    backface-visibility: hidden;
+  }
+  
+  .cardBack {
+    transform: rotateY(180deg);
+  }

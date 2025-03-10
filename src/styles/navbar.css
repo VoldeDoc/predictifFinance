@@ -1,0 +1,126 @@
+/***** navbar *****/
+.navbar {
+  overflow: hidden;
+  background-color: rgb(255, 255, 255);
+  transition: max-height 0.6s ease-in-out; /* Add transition for height */
+}
+
+a.active {
+  color: #6506bd;
+}
+
+.navbar a {
+  float: left;
+  display: block;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 17px;
+}
+
+.collapse {
+  display: none;
+}
+
+.icon {
+  display: none; /* Hide by default */
+  transition: transform 0.6s ease-in-out; /* Add transition for transform */
+}
+
+.icon.rotate {
+  transform: rotate(180deg); /* Rotate 180 degrees */
+}
+
+@keyframes flip {
+  0% {
+    transform: rotateY(0);
+  }
+  100% {
+    transform: rotateY(180deg);
+  }
+}
+
+@media screen and (max-width: 853px) {
+  .navbar a {
+    float: none;
+    display: none;
+  }
+
+  .navbar-brand {
+    display: none;
+  }
+
+  .navbar {
+    width: 100%;
+  }
+
+  .navbar-links {
+    display: flex;
+    justify-content: center;
+    transition: max-height 0.6s ease-in-out; /* Add transition for height */
+    max-height: 0; /* Default height */
+    overflow: hidden; /* Hide overflow */
+  }
+
+  .icon {
+    display: block; /* Show on small screens */
+    float: right;
+    z-index: 9999;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+  }
+
+  .navbar.responsive button.icon {
+    position: absolute;
+    right: 0px;
+    top: 10px;
+  }
+
+  .navbar.responsive {
+    position: relative;
+    max-height: 500px; /* Expanded height */
+  }
+
+  .navbar.responsive .navbar-links {
+    background-color: rgb(252, 248, 248);
+    z-index: 9999;
+    flex-direction: column; /* Ensure links are displayed vertically */
+    align-items: center; /* Center the links */
+    max-height: 500px; /* Expanded height */
+  }
+
+  .navbar.responsive a {
+    float: none;
+    display: block;
+    text-align: left;
+    width: 100%; /* Ensure links take full width */
+    padding: 14px 16px; /* Add padding for better spacing */
+  }
+
+  .navbar.responsive a:hover {
+    background-color: #726969;
+  }
+
+  .navbar-links {
+    display: block;
+    width: 100%;
+  }
+}
+
+/***** End navbar *****/
+.hero {
+  background-image: url("/assets/images/landingPage/hand-holding-phone.png");
+  background-position: right bottom;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+/***** footer *****/
+footer {
+  background-color: #131314;
+  color: white;
+}
+
+/***** End footer *****/
