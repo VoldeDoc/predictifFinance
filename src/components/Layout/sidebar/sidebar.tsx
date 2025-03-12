@@ -19,9 +19,9 @@ const MENU_ITEMS = [
     path: "/dashboard",
   },
   {
-    name: "Portfolio",
+    name: "Savings",
     icon: BsFillBriefcaseFill,
-    path: "/portfolio",
+    path: "/savings",
   },
   {
     name: "Predictive Account",

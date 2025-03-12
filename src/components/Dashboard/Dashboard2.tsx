@@ -19,12 +19,13 @@ const Dashboard2 = () => {
                     {/* First Column - 32% */}
                     <div className="w-full lg:w-[32%]">
                         <div className="bg-white p-4 rounded-lg shadow-sm">
-                            <CreditCard 
-                                cardNumber="1234567890123456" 
-                                cardholderName="John Doe" 
-                                expiryDate="12/23" 
-                                cvv="1234" 
-                                cardType="VISA" 
+                            <CreditCard
+                                cardNumber="1234567890123456"
+                                cardholderName="John Doe"
+                                expiryDate="12/23"
+                                cvv="1234"
+                                cardType="VISA"
+                            // size="md"
                             />
                             <CreditCardBtn />
                         </div>
@@ -35,7 +36,7 @@ const Dashboard2 = () => {
                             <SavingPlan />
                         </div>
                     </div>
-                    
+
                     {/* Second Column - 45% */}
                     <div className="w-full lg:w-[45%]">
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -61,28 +62,28 @@ const Dashboard2 = () => {
                         <div>
                             <CashFlow />
                         </div>
-                        
-                        <TransactionTable 
-                            initialPageSize={4} 
-                            maxHeight="350px" 
+
+                        <TransactionTable
+                            initialPageSize={4}
+                            maxHeight="350px"
                         />
                     </div>
-                    
+
                     {/* Third Column - 22% */}
                     <div className="w-full lg:w-[22%]">
                         {/* Pie Chart with tabs */}
                         <PieChart />
-                        
-                     <RecentActivity />
+
+                        <RecentActivity />
                     </div>
                 </div>
                 <div className="px-4 md:px-6 lg:px-4">
-                <AnalyticsSparkline 
-                            title="Analytics"
-                            maxY={50000}
-                            lineColor="#3B82F6"
-                            fillColor="#93C5FD"
-                        />
+                    <AnalyticsSparkline
+                        title="Analytics"
+                        maxY={50000}
+                        lineColor="#3B82F6"
+                        fillColor="#93C5FD"
+                    />
 
                 </div>
             </div>

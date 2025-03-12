@@ -1,36 +1,40 @@
 import { CgAddR } from "react-icons/cg";
 import { CiDollar } from "react-icons/ci";
-import { FaRegFileAlt } from "react-icons/fa";
-import { BsClock } from "react-icons/bs"
+import { BsClock } from "react-icons/bs";
 
-export default function CreditCardBtn() {
-    return (
-        <>
-        <div className="bg-[#EEF3FF] px-y py-3 rounded-2xl mt-5">
-            <div className="flex justify-between">
-                <button className="flex flex-col items-center p-3  rounded-lg  hover:bg-gray-50">
-                    <CgAddR className="h-6 w-6 text-[#002072]" />
-                    <span className="mt-2 text-sm font-medium">Top-up</span>
-                </button>
-
-                <button className="flex flex-col items-center p-3  rounded-lg  hover:bg-gray-50">
-                    <CiDollar className="h-6 w-6 text-[#002072]" />
-                    <span className="mt-2 text-sm font-medium">Transfer</span>
-                </button>
-
-                <button className="flex flex-col items-center p-3  rounded-lg  hover:bg-gray-50">
-                    <FaRegFileAlt className="h-6 w-6 text-[#002072]" />
-                    <span className="mt-2 text-sm font-medium">Request</span>
-                </button>
-
-                <button className="flex flex-col items-center p-3  rounded-lg  hover:bg-gray-50">
-                    <BsClock className="h-6 w-6 text-[#002072]" />
-                    <span className="mt-2 text-sm font-medium">History</span>
-                </button>
-            </div>
-        </div >
-        </>
-    )
-
+interface CreditCardBtnProps {
+  bgClassName?: string; // Use Tailwind classes for background
+  hoverClassName?: string; // Use Tailwind classes for hover
+  iconColor?: string; // Use a color string for icon color
+  textColor?: string; // Optional text color
 }
 
+export default function CreditCardBtn({
+  bgClassName = "bg-[#EEF3FF]", // Default using Tailwind's arbitrary value syntax
+  hoverClassName = "hover:bg-gray-50",
+  iconColor = "#002072",
+  textColor = "text-gray-800"
+}: CreditCardBtnProps) {
+  return (
+    <>
+      <div className={`${bgClassName} px-2 py-2 rounded-xl mt-3`}>
+        <div className="flex justify-between">
+          <button className={`flex flex-col items-center p-2 rounded-lg ${hoverClassName}`}>
+            <CgAddR style={{ color: iconColor }} className="h-4 w-4" />
+            <span className={`mt-1 text-xs font-medium ${textColor}`}>Top-up</span>
+          </button>
+
+          <button className={`flex flex-col items-center p-2 rounded-lg ${hoverClassName}`}>
+            <CiDollar style={{ color: iconColor }} className="h-4 w-4" />
+            <span className={`mt-1 text-xs font-medium ${textColor}`}>Transfer</span>
+          </button>
+
+          <button className={`flex flex-col items-center p-2 rounded-lg ${hoverClassName}`}>
+            <BsClock style={{ color: iconColor }} className="h-4 w-4" />
+            <span className={`mt-1 text-xs font-medium ${textColor}`}>History</span>
+          </button>
+        </div>
+      </div>
+    </>
+  );
+}

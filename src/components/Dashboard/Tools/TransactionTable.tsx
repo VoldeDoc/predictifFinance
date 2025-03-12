@@ -1,18 +1,24 @@
-import  { useState, useEffect } from 'react';
+import { useState, useEffect, ReactNode } from 'react';
 import { MagnifyingGlassIcon, ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import { FunnelIcon } from '@heroicons/react/24/solid';
-
 
 interface Transaction {
   id: string;
   name: string;
+  icon?: ReactNode;
+  account?: string;
   date: string;          
   time?: string;          
   amount: number;
   description?: string;   
   status: 'completed' | 'pending' | 'failed';
-  category: string;
+  category?: string;
   type: 'income' | 'expense';
+}
+
+interface TableHeader {
+  key: string;
+  label: string;
 }
 
 interface TransactionTableProps {
@@ -21,6 +27,10 @@ interface TransactionTableProps {
   initialPageSize?: number;
   maxHeight?: string;
   customData?: Transaction[];
+  customHeaders?: TableHeader[];
+  renderNameWithIcon?: boolean;
+  hideCategory?: boolean;
+  hideType?: boolean;
 }
 
 export default function TransactionTable({ 
@@ -28,9 +38,31 @@ export default function TransactionTable({
   showTitle = true,
   initialPageSize = 5,
   maxHeight = "350px",
-  customData
+  customData,
+  customHeaders,
+  renderNameWithIcon = false,
+  hideCategory = false,
+  // hideType = false
 }: TransactionTableProps) {
   
+  // Default table headers
+  const defaultHeaders: TableHeader[] = [
+    { key: 'name', label: 'Transaction' },
+    { key: 'amount', label: 'Amount' },
+    { key: 'date', label: 'Date' },
+  ];
+
+  // Add category header if not hidden
+  if (!hideCategory) {
+    defaultHeaders.push({ key: 'category', label: 'Category' });
+  }
+  
+  // Always add status header
+  defaultHeaders.push({ key: 'status', label: 'Status' });
+  
+  // Use custom headers if provided, otherwise use default headers
+  const headers = customHeaders || defaultHeaders;
+
   // Sample transactions data
   const defaultTransactions: Transaction[] = [
     { 
@@ -44,138 +76,7 @@ export default function TransactionTable({
       category: 'Income', 
       type: 'income' 
     },
-    { 
-      id: 'TX002', 
-      name: 'Amazon', 
-      date: '2025-03-05', 
-      time: '14:32:10',
-      amount: -250, 
-      description: 'Online shopping for electronics',
-      status: 'completed', 
-      category: 'Shopping', 
-      type: 'expense' 
-    },
-    { 
-      id: 'TX003', 
-      name: 'Starbucks', 
-      date: '2025-03-02', 
-      time: '08:45:33',
-      amount: -12.5, 
-      description: 'Coffee and breakfast',
-      status: 'completed', 
-      category: 'Food & Drinks', 
-      type: 'expense' 
-    },
-    { 
-      id: 'TX004', 
-      name: 'Netflix Subscription', 
-      date: '2025-03-01', 
-      time: '00:01:05',
-      amount: -14.99, 
-      description: 'Monthly subscription fee',
-      status: 'completed', 
-      category: 'Entertainment', 
-      type: 'expense' 
-    },
-    { 
-      id: 'TX005', 
-      name: 'Freelance Work', 
-      date: '2025-03-08', 
-      time: '16:20:45',
-      amount: 750, 
-      description: 'Website development project',
-      status: 'pending', 
-      category: 'Income', 
-      type: 'income' 
-    },
-    { 
-      id: 'TX006', 
-      name: 'Uber Ride', 
-      date: '2025-03-07', 
-      time: '19:12:38',
-      amount: -32.5, 
-      description: 'Transportation to downtown meeting',
-      status: 'completed', 
-      category: 'Transport', 
-      type: 'expense' 
-    },
-    { 
-      id: 'TX007', 
-      name: 'Grocery Store', 
-      date: '2025-03-06', 
-      time: '11:05:17',
-      amount: -135.27, 
-      description: 'Weekly grocery shopping',
-      status: 'completed', 
-      category: 'Groceries', 
-      type: 'expense' 
-    },
-    { 
-      id: 'TX008', 
-      name: 'Investment Dividend', 
-      date: '2025-03-10', 
-      time: '10:00:00',
-      amount: 120.5, 
-      description: 'Quarterly dividend payment',
-      status: 'pending', 
-      category: 'Investment', 
-      type: 'income' 
-    },
-    { 
-      id: 'TX009', 
-      name: 'Electric Bill', 
-      date: '2025-03-12', 
-      time: '15:45:22',
-      amount: -87.35, 
-      description: 'Monthly utility payment',
-      status: 'pending', 
-      category: 'Utilities', 
-      type: 'expense' 
-    },
-    { 
-      id: 'TX010', 
-      name: 'Phone Bill', 
-      date: '2025-03-15', 
-      time: '08:30:11',
-      amount: -65, 
-      description: 'Monthly mobile service fee',
-      status: 'failed', 
-      category: 'Utilities', 
-      type: 'expense' 
-    },
-    { 
-      id: 'TX011', 
-      name: 'Bonus Payment', 
-      date: '2025-03-20', 
-      time: '17:05:45',
-      amount: 1200, 
-      description: 'Performance bonus',
-      status: 'pending', 
-      category: 'Income', 
-      type: 'income' 
-    },
-    { 
-      id: 'TX012', 
-      name: 'Electricity Bill', 
-      date: '2028-03-01', 
-      time: '04:28:48',
-      amount: -295.81, 
-      description: 'Payment for monthly electricity bill',
-      status: 'failed', 
-      category: 'Payments', 
-      type: 'expense' 
-    },
-    { 
-      id: 'TX013', 
-      name: 'Restaurant Dinner', 
-      date: '2025-03-14', 
-      time: '20:15:30',
-      amount: -85.75, 
-      description: 'Dinner with friends',
-      status: 'completed', 
-      category: 'Food & Drinks', 
-      type: 'expense' 
-    },
+    // ... your default transactions
   ];
 
   // State variables
@@ -188,8 +89,7 @@ export default function TransactionTable({
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
   const [filterOpen, setFilterOpen] = useState(false);
   const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [typeFilter, setTypeFilter] = useState<string>('all');
-  const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  const [accountFilter, setAccountFilter] = useState<string>('all');
 
   // Update transactions if customData changes
   useEffect(() => {
@@ -199,8 +99,12 @@ export default function TransactionTable({
     }
   }, [customData]);
 
-  // Get unique categories for the filter
-  const categories = Array.from(new Set(transactions.map(tx => tx.category)));
+  // Get unique accounts for the filter
+  const accounts = Array.from(new Set(
+    transactions
+      .filter(tx => tx.account)
+      .map(tx => tx.account as string)
+  ));
 
   // Calculate pagination values
   const totalPages = Math.ceil(filteredTransactions.length / pageSize);
@@ -216,7 +120,8 @@ export default function TransactionTable({
       result = result.filter(tx => 
         tx.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
         tx.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (tx.description && tx.description.toLowerCase().includes(searchTerm.toLowerCase()))
+        (tx.description && tx.description.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (tx.account && tx.account.toLowerCase().includes(searchTerm.toLowerCase()))
       );
     }
 
@@ -225,14 +130,9 @@ export default function TransactionTable({
       result = result.filter(tx => tx.status === statusFilter);
     }
 
-    // Apply type filter
-    if (typeFilter !== 'all') {
-      result = result.filter(tx => tx.type === typeFilter);
-    }
-
-    // Apply category filter
-    if (categoryFilter !== 'all') {
-      result = result.filter(tx => tx.category === categoryFilter);
+    // Apply account filter if available
+    if (accountFilter !== 'all') {
+      result = result.filter(tx => tx.account === accountFilter);
     }
 
     // Apply sorting
@@ -247,13 +147,17 @@ export default function TransactionTable({
         const dateA = new Date(a.date + (a.time ? `T${a.time}` : '')).getTime();
         const dateB = new Date(b.date + (b.time ? `T${b.time}` : '')).getTime();
         return sortDirection === 'asc' ? dateA - dateB : dateB - dateA;
+      } else if (sortKey === 'account' && a.account && b.account) {
+        return sortDirection === 'asc' ? 
+          a.account.localeCompare(b.account) : 
+          b.account.localeCompare(a.account);
       }
       return 0;
     });
 
     setFilteredTransactions(result);
     setCurrentPage(1); // Reset to first page when filters change
-  }, [transactions, searchTerm, sortKey, sortDirection, statusFilter, typeFilter, categoryFilter]);
+  }, [transactions, searchTerm, sortKey, sortDirection, statusFilter, accountFilter]);
 
   // Handle sorting toggle
   const handleSort = (key: string) => {
@@ -324,7 +228,7 @@ export default function TransactionTable({
       {/* Filter Panel */}
       {filterOpen && (
         <div className="mb-4 p-3 border border-gray-200 rounded-md bg-gray-50">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
               <select 
@@ -339,32 +243,21 @@ export default function TransactionTable({
               </select>
             </div>
             
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
-              <select 
-                className="w-full px-2 py-1.5 border border-gray-300 rounded-md text-sm"
-                value={typeFilter}
-                onChange={(e) => setTypeFilter(e.target.value)}
-              >
-                <option value="all">All Types</option>
-                <option value="income">Income</option>
-                <option value="expense">Expense</option>
-              </select>
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
-              <select 
-                className="w-full px-2 py-1.5 border border-gray-300 rounded-md text-sm"
-                value={categoryFilter}
-                onChange={(e) => setCategoryFilter(e.target.value)}
-              >
-                <option value="all">All Categories</option>
-                {categories.map(category => (
-                  <option key={category} value={category}>{category}</option>
-                ))}
-              </select>
-            </div>
+            {accounts.length > 0 && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Account</label>
+                <select 
+                  className="w-full px-2 py-1.5 border border-gray-300 rounded-md text-sm"
+                  value={accountFilter}
+                  onChange={(e) => setAccountFilter(e.target.value)}
+                >
+                  <option value="all">All Accounts</option>
+                  {accounts.map(account => (
+                    <option key={account} value={account}>{account}</option>
+                  ))}
+                </select>
+              </div>
+            )}
           </div>
           
           <div className="mt-3 flex justify-end">
@@ -372,8 +265,7 @@ export default function TransactionTable({
               className="px-3 py-1 text-sm bg-white border border-gray-300 rounded-md mr-2 hover:bg-gray-50"
               onClick={() => {
                 setStatusFilter('all');
-                setTypeFilter('all');
-                setCategoryFilter('all');
+                setAccountFilter('all');
                 setSearchTerm('');
               }}
             >
@@ -394,86 +286,125 @@ export default function TransactionTable({
         <table className="w-full">
           <thead className="bg-gray-50 text-xs uppercase text-gray-700 sticky top-0 z-10">
             <tr>
-              <th className="px-4 py-2 text-left">
-                <button 
-                  className="flex items-center font-semibold"
-                  onClick={() => handleSort('name')}
-                >
-                  Transaction
-                  {sortKey === 'name' && (
-                    <span className="ml-1">
-                      {sortDirection === 'asc' ? '↑' : '↓'}
-                    </span>
-                  )}
-                </button>
-              </th>
-              <th className="px-4 py-2 text-center">
-                <button 
-                  className="flex items-center font-semibold mx-auto"
-                  onClick={() => handleSort('amount')}
-                >
-                  Amount
-                  {sortKey === 'amount' && (
-                    <span className="ml-1">
-                      {sortDirection === 'asc' ? '↑' : '↓'}
-                    </span>
-                  )}
-                </button>
-              </th>
-              <th className="px-4 py-2 text-center">
-                <button 
-                  className="flex items-center font-semibold mx-auto"
-                  onClick={() => handleSort('date')}
-                >
-                  Date
-                  {sortKey === 'date' && (
-                    <span className="ml-1">
-                      {sortDirection === 'asc' ? '↑' : '↓'}
-                    </span>
-                  )}
-                </button>
-              </th>
-              <th className="px-4 py-2 text-left hidden md:table-cell">Category</th>
-              <th className="px-4 py-2 text-center">Status</th>
+              {headers.map((header) => (
+                <th key={header.key} className="px-4 py-2 text-left">
+                  <button 
+                    className="flex items-center font-semibold"
+                    onClick={() => handleSort(header.key)}
+                  >
+                    {header.label}
+                    {sortKey === header.key && (
+                      <span className="ml-1">
+                        {sortDirection === 'asc' ? '↑' : '↓'}
+                      </span>
+                    )}
+                  </button>
+                </th>
+              ))}
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
             {paginatedTransactions.length > 0 ? (
               paginatedTransactions.map((tx) => (
                 <tr key={tx.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3">
-                    <div>
-                      <p className="font-medium">{tx.name}</p>
-                      <p className="text-xs text-gray-500">{tx.id}</p>
-                      {tx.description && (
-                        <p className="text-xs text-gray-500 truncate max-w-[180px]">{tx.description}</p>
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    <span className={`font-semibold ${tx.amount >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                      {tx.amount >= 0 ? '+' : ''}{tx.amount.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    <div>
-                      <div className="text-xs">{tx.date}</div>
-                      {tx.time && <div className="text-xs text-gray-500">{tx.time}</div>}
-                    </div>
-                  </td>
-                  <td className="px-4 py-3 hidden md:table-cell">
-                    <span className="text-sm">{tx.category}</span>
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${getStatusBadge(tx.status)}`}>
-                      {tx.status.charAt(0).toUpperCase() + tx.status.slice(1)}
-                    </span>
-                  </td>
+                  {/* Render each cell based on headers */}
+                  {headers.map(header => {
+                    // Name column with optional icon
+                    if (header.key === 'name') {
+                      return (
+                        <td key={header.key} className="px-4 py-3">
+                          <div className="flex items-center">
+                            {renderNameWithIcon && tx.icon && (
+                              <div className="flex-shrink-0 flex items-center justify-center bg-[#4FB7EF73] rounded-full p-2 mr-3">
+                                {tx.icon}
+                              </div>
+                            )}
+                            <div>
+                              <p className="font-medium">{tx.name}</p>
+                            </div>
+                          </div>
+                        </td>
+                      );
+                    }
+                    
+                    // Account column
+                    if (header.key === 'account') {
+                      return (
+                        <td key={header.key} className="px-4 py-3">
+                          {tx.account || '—'}
+                        </td>
+                      );
+                    }
+                    
+                    // ID column
+                    if (header.key === 'id') {
+                      return (
+                        <td key={header.key} className="px-4 py-3">
+                          <span className="text-gray-600">{tx.id}</span>
+                        </td>
+                      );
+                    }
+                    
+                    // Date column
+                    if (header.key === 'date') {
+                      return (
+                        <td key={header.key} className="px-4 py-3">
+                          <div>
+                            <div className="text-sm">{tx.date}</div>
+                            {tx.time && <div className="text-xs text-gray-500">{tx.time}</div>}
+                          </div>
+                        </td>
+                      );
+                    }
+                    
+                    // Amount column
+                    if (header.key === 'amount') {
+                      return (
+                        <td key={header.key} className="px-4 py-3">
+                          <span className={`font-semibold ${tx.amount >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                            {tx.amount >= 0 ? '+' : ''}{tx.amount.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}
+                          </span>
+                        </td>
+                      );
+                    }
+                    
+                    // Description/Note column
+                    if (header.key === 'description') {
+                      return (
+                        <td key={header.key} className="px-4 py-3">
+                          <span className="text-sm text-gray-600">{tx.description || '—'}</span>
+                        </td>
+                      );
+                    }
+                    
+                    // Category column
+                    if (header.key === 'category' && !hideCategory) {
+                      return (
+                        <td key={header.key} className="px-4 py-3">
+                          <span className="text-sm">{tx.category || '—'}</span>
+                        </td>
+                      );
+                    }
+                    
+                    // Status column
+                    if (header.key === 'status') {
+                      return (
+                        <td key={header.key} className="px-4 py-3">
+                          <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${getStatusBadge(tx.status)}`}>
+                            {tx.status.charAt(0).toUpperCase() + tx.status.slice(1)}
+                          </span>
+                        </td>
+                      );
+                    }
+                    
+                    // Default case
+                    return <td key={header.key} className="px-4 py-3">—</td>;
+                  })}
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan={5} className="px-4 py-6 text-center text-gray-500">
+                <td colSpan={headers.length} className="px-4 py-6 text-center text-gray-500">
                   No transactions found matching your filters.
                 </td>
               </tr>

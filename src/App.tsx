@@ -17,6 +17,7 @@ import Stocking from "@/pages/stock";
 import Market from "@/pages/marketzone";
 import Dashboard2Page from "./pages/dashboard2";
 import PredictiveAccountPage from "./pages/predictive_account/predictiveAccountPage";
+import SavingsPage from "./pages/Savings";
 
 
 function App() {
@@ -57,6 +58,7 @@ function App() {
               <Route path="/market-zone" element={<Market />} />
               <Route path="/dashboard2" element={<Dashboard2Page />} />
               <Route path="/predictive-account" element={<PredictiveAccountPage />} />
+              <Route path="/savings" element={<SavingsPage />} />
 
 
               {/* Ui */}
