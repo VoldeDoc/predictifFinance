@@ -18,6 +18,13 @@ import Market from "@/pages/marketzone";
 import Dashboard2Page from "./pages/dashboard2";
 import PredictiveAccountPage from "./pages/predictive_account/predictiveAccountPage";
 import SavingsPage from "./pages/Savings";
+import EducationPage from "./pages/education";
+import Course from "./components/Education/Tool/course";
+import CourseDetail from "./components/Education/Tool/courseDetail";
+import MarketNews from "./components/MarketNews/MarketNews";
+import MarketNewsDetails from "./components/MarketNews/MarketNewsDetails";
+import AnalysisDetailsPage from "./pages/analysis";
+import Analysis from "./components/Analysis/Analysis";
 
 
 function App() {
@@ -59,6 +66,13 @@ function App() {
               <Route path="/dashboard2" element={<Dashboard2Page />} />
               <Route path="/predictive-account" element={<PredictiveAccountPage />} />
               <Route path="/savings" element={<SavingsPage />} />
+              <Route path="/education" element={<EducationPage />} />
+              <Route path="/course" element={<Course />} />
+              <Route path="/course-detail" element={<CourseDetail />} />
+              <Route path="/market-news" element={<MarketNews />} />
+              <Route path="/market-news/details" element={<MarketNewsDetails />} />
+              <Route path="/analysis/details" element={<AnalysisDetailsPage />} />
+              <Route path="/analysis" element={<Analysis />} />
 
 
               {/* Ui */}

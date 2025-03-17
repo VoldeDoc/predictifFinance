@@ -25,7 +25,7 @@ const Dashboard2 = () => {
                                 expiryDate="12/23"
                                 cvv="1234"
                                 cardType="VISA"
-                            // size="md"
+                            size="sm"
                             />
                             <CreditCardBtn />
                         </div>

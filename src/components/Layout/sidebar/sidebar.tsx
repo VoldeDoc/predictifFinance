@@ -1,12 +1,12 @@
 import { Dispatch, forwardRef, SetStateAction } from "react";
 import { NavLink } from "react-router-dom";
-import { GrClose, GrTransaction } from "react-icons/gr";
-import { BsFillBriefcaseFill } from "react-icons/bs";
-import { MdDashboard, MdOutlineWallet } from "react-icons/md";
-import { AiFillSliders } from "react-icons/ai";
+import { GrClose } from "react-icons/gr";
+import { MdDashboard } from "react-icons/md";
 import { IoIosLogOut } from "react-icons/io";
-import { bulb } from "../../../../public";
-
+import { FaSackDollar } from "react-icons/fa6";
+import { PiHeadCircuitThin } from "react-icons/pi";
+import Logo from "../../../../public/assets/images/dashboard/dashboard/Transparent Logo 1.svg";
+import { NewspaperIcon } from "@heroicons/react/24/solid";
 type Props = {
   showNav: boolean;
   setShowNav: Dispatch<SetStateAction<boolean>>;
@@ -19,78 +19,46 @@ const MENU_ITEMS = [
     path: "/dashboard",
   },
   {
-    name: "Savings",
-    icon: BsFillBriefcaseFill,
-    path: "/savings",
+    name: "Portfolio",
+    svg: <svg width="24" height="24" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M28.2651 24.1333C27.3318 24 26.3984 23.8667 25.3318 23.8667C21.9984 23.8667 18.7984 24.8 15.9984 26.6667C13.1984 24.9333 9.99843 23.8667 6.6651 23.8667C5.73177 23.8667 4.6651 24 3.73177 24.1333C3.0651 24.2667 2.53177 24.9333 2.6651 25.7333C2.79843 26.5333 3.4651 26.9333 4.2651 26.8C5.0651 26.6667 5.8651 26.5333 6.6651 26.5333C9.73177 26.5333 12.6651 27.4667 15.1984 29.3333C15.5984 29.7333 16.2651 29.7333 16.7984 29.3333C19.9984 27.0667 23.9984 26.1333 27.7318 26.8C28.3984 26.9333 29.1984 26.4 29.3318 25.7333C29.4651 24.9333 28.9318 24.2667 28.2651 24.1333ZM28.2651 2.79999C27.3318 2.66666 26.3984 2.53333 25.3318 2.53333C21.9984 2.53333 18.7984 3.46666 15.9984 5.33332C13.1984 3.46666 9.99843 2.53333 6.6651 2.53333C5.73177 2.53333 4.6651 2.66666 3.73177 2.79999C3.19843 2.79999 2.6651 3.46666 2.6651 3.99999V20C2.6651 20.8 3.19843 21.3333 3.99843 21.3333C4.13177 21.3333 4.13177 21.3333 4.2651 21.3333C5.0651 21.2 5.8651 21.0667 6.6651 21.0667C9.73177 21.0667 12.6651 22 15.1984 23.8667C15.5984 24.2667 16.2651 24.2667 16.7984 23.8667C19.9984 21.6 23.9984 20.6667 27.7318 21.3333C28.3984 21.4667 29.1984 20.9333 29.3318 20.2667C29.3318 20.1333 29.3318 20.1333 29.3318 20V3.99999C29.3318 3.46666 28.7984 2.79999 28.2651 2.79999Z" fill="currentColor" />
+    </svg>,
+    path: "/dashboard2",
   },
   {
-    name: "Predictive Account",
-    icon: AiFillSliders,
+    name: "Predict.if Account",
+    svg: <svg width="20" height="20" viewBox="0 0 32 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M26 2.46997H24.51V1.5C24.51 0.67999 23.84 0 23.01 0C22.18 0 21.51 0.67999 21.51 1.5V2.46997H17.5V1.5C17.5 0.67999 16.83 0 16 0C15.17 0 14.5 0.67999 14.5 1.5V2.46997H10.49V1.5C10.49 0.67999 9.82001 0 8.98999 0C8.15997 0 7.48999 0.67999 7.48999 1.5V2.46997H6C2.96997 2.46997 0.5 4.92999 0.5 7.96997V22.5C0.5 25.53 2.96997 28 6 28H26C29.03 28 31.5 25.53 31.5 22.5V7.96997C31.5 4.92999 29.03 2.46997 26 2.46997ZM28.5 9.62H3.5V7.96997C3.5 6.58997 4.62 5.46997 6 5.46997H7.48999V6.38C7.48999 7.20996 8.15997 7.88 8.98999 7.88C9.82001 7.88 10.49 7.20996 10.49 6.38V5.46997H14.5V6.38C14.5 7.20996 15.17 7.88 16 7.88C16.83 7.88 17.5 7.20996 17.5 6.38V5.46997H21.51V6.38C21.51 7.20996 22.18 7.88 23.01 7.88C23.84 7.88 24.51 7.20996 24.51 6.38V5.46997H26C27.38 5.46997 28.5 6.58997 28.5 7.96997V9.62Z" fill="currentColor" />
+    </svg>,
     path: "/predictive-account",
   },
   {
-    name: "Research Portal",
-    icon: MdOutlineWallet,
-    path: "/research-portal",
+    name: "Savings",
+    icon: FaSackDollar,
+    path: "/savings",
   },
   {
-    name: "Wallet Transfer Pay",
-    svg: (
-      <svg
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-        fill="currentColor"
-        stroke="currentColor"
-        strokeWidth={0}
-        xmlns="http://www.w3.org/2000/svg"
-        className="md:h-8 h-9 md:w-8"
-      >
-        <path fill="none" d="M0 0h24v24H0z"></path>
-        <path d="M13 10V7H16V5L20 8.5L16 12V10H13ZM12 3.7V5H0V3.7L6 0L12 3.7ZM5 6H7V11H5V6ZM1 6H3V11H1V6ZM11 6V8.5L9 10.3V6H11ZM7.1 12L6.5 12.5L8.2 14H0V12H7.1ZM15 11V14H12V16L8 12.5L12 9V11H15Z" />
-      </svg>
-    ),
-    path: "/wallet-transfer-pay",
+    name: "Education",
+    icon: PiHeadCircuitThin,
+    path: "/education",
   },
   {
-    name: "Reporting & Transaction",
-    icon: GrTransaction,
-    path: "/reporting-transaction",
+    name: "Market News",
+    icon: NewspaperIcon,
+    path: "/market-news",
   },
   {
-    name: "Tutorial",
-    svg: (
-      <svg
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-        fill="currentColor"
-        stroke="currentColor"
-        strokeWidth={0}
-        xmlns="http://www.w3.org/2000/svg"
-        className="md:h-8 h-9 md:w-8"
-      >
-        <path fill="none" d="M0 0h24v24H0z"></path>
-        <path d="M19.199 17.1429C18.9318 17.1442 18.6683 17.2101 18.4281 17.3357L15.8485 14.5714H13.7998V15.8571H15.3512L17.5799 18.2454C17.4625 18.5027 17.4008 18.785 17.3993 19.0714C17.3993 19.4529 17.5048 19.8257 17.7026 20.1429C17.9003 20.46 18.1814 20.7072 18.5103 20.8532C18.8391 20.9992 19.201 21.0374 19.5501 20.9629C19.8992 20.8885 20.2199 20.7048 20.4716 20.4351C20.7233 20.1654 20.8947 19.8218 20.9642 19.4477C21.0336 19.0736 20.998 18.6858 20.8618 18.3334C20.7255 17.981 20.4949 17.6798 20.1989 17.4679C19.9029 17.256 19.555 17.1429 19.199 17.1429ZM19.199 10.0714C18.828 10.0726 18.4664 10.1968 18.164 10.427C17.8615 10.6573 17.6329 10.9822 17.5097 11.3571H13.7998V12.6429H17.5097C17.6202 12.9753 17.8139 13.2688 18.0695 13.4913C18.3252 13.7138 18.633 13.8568 18.9593 13.9045C19.2857 13.9522 19.618 13.9029 19.9199 13.7619C20.2218 13.6209 20.4818 13.3937 20.6714 13.1051C20.861 12.8165 20.9729 12.4777 20.9949 12.1255C21.017 11.7734 20.9482 11.4215 20.7963 11.1084C20.6443 10.7953 20.4149 10.5329 20.1332 10.3501C19.8516 10.1672 19.5284 10.0708 19.199 10.0714ZM19.199 3C18.7218 3.00051 18.2644 3.20386 17.9269 3.56543C17.5895 3.927 17.3998 4.41724 17.3993 4.92857C17.4013 5.23654 17.473 5.53939 17.6081 5.81122L15.3572 8.14286H13.7998V9.42857H15.8419L18.4815 6.69514C18.7267 6.80972 18.9927 6.86427 19.26 6.85481C19.5274 6.84535 19.7894 6.77212 20.027 6.64046C20.2646 6.50879 20.4719 6.32201 20.6336 6.0937C20.7954 5.86539 20.9076 5.60131 20.9621 5.32067C21.0166 5.04003 21.012 4.7499 20.9486 4.4714C20.8853 4.1929 20.7648 3.93304 20.5959 3.71074C20.427 3.48845 20.214 3.3093 19.9724 3.18635C19.7307 3.0634 19.4665 2.99974 19.199 3Z" />
-        <path d="M13.1556 6.12244H14.3V5H13.1556C12.8295 5.00107 12.5074 5.07088 12.2112 5.2047C11.915 5.33851 11.6516 5.53321 11.4389 5.7756C11.2261 5.53321 10.9627 5.33851 10.6666 5.2047C10.3704 5.07088 10.0483 5.00107 9.72222 5H9.15C7.7846 5.00149 6.47556 5.53412 5.51007 6.48103C4.54459 7.42795 4.00151 8.71182 4 10.051V13.4183C4.00151 14.7574 4.54459 16.0413 5.51007 16.9882C6.47556 17.9351 7.7846 18.4677 9.15 18.4692H9.72222C10.0483 18.4682 10.3704 18.3984 10.6666 18.2645C10.9627 18.1307 11.2261 17.936 11.4389 17.6936C11.6516 17.936 11.915 18.1307 12.2112 18.2645C12.5074 18.3984 12.8295 18.4682 13.1556 18.4692H14.3V17.3468H13.1556C12.8521 17.3465 12.5612 17.2281 12.3466 17.0177C12.1321 16.8073 12.0114 16.522 12.0111 16.2244V7.24487C12.0114 6.94727 12.1321 6.66195 12.3466 6.45152C12.5612 6.24109 12.8521 6.12273 13.1556 6.12244Z" />
-        <path
-          d="M5.2793 10.0421H6.52476C7.35319 10.0421 8.02476 9.37055 8.02476 8.54213V7.68208"
-          stroke="#808080"
-        />
-        <path
-          d="M10.7705 13.3919L9.97699 13.3919C9.14856 13.3919 8.47699 14.0635 8.47699 14.8919L8.47699 15.752"
-          stroke="#808080"
-        />
-        <path d="M10.7705 11.0317L9.35733 11.0317" stroke="#808080" />
-        <path d="M6.69287 13.0078L5.27969 13.0078" stroke="#808080" />
-      </svg>
-    ),
-    path: "/tutorial",
+    name: "Analysis",
+    svg: <svg width="24" height="25" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M18.6 13.1316C21.5823 13.1316 24 15.6765 24 18.8158C24 21.9551 21.5823 24.5 18.6 24.5C15.6176 24.5 13.2 21.9551 13.2 18.8158C13.2 15.6765 15.6176 13.1316 18.6 13.1316ZM16.8 15.6579V21.9737L22.2 18.8158L16.8 15.6579ZM12.2484 16.921C12.0831 17.5376 11.9995 18.1752 12 18.8158C12 19.0287 12.0091 19.2394 12.0269 19.4475L0 19.4474V16.921H12.2484ZM4.79998 6.81581V15.6579H1.19998V6.81581H4.79998ZM10.8 10.6053V15.6579H7.19999V10.6053H10.8ZM16.8 9.34209L16.7999 12.13C15.3252 12.569 14.0604 13.5341 13.1998 14.8205L13.2 9.34209H16.8ZM22.8 10.6053L22.8001 13.4565C21.8036 12.5903 20.5614 12.0259 19.2001 11.8967L19.2 10.6053H22.8ZM15 0.5C15.9941 0.5 16.8 1.34831 16.8 2.39474C16.8 2.42055 16.7995 2.44621 16.7985 2.47171L19.6472 3.67114C19.9771 3.27585 20.4608 3.02634 21 3.02634C21.9941 3.02634 22.8 3.87465 22.8 4.92108C22.8 5.9675 21.9941 6.81581 21 6.81581C20.0059 6.81581 19.2 5.9675 19.2 4.92108C19.2 4.89526 19.2005 4.86956 19.2014 4.84398L16.3529 3.64456C16.023 4.0399 15.5391 4.28948 15 4.28948C14.5811 4.29014 14.1753 4.13642 13.8529 3.85499L10.7641 5.80627C10.7876 5.92843 10.7999 6.05478 10.7999 6.18422C10.7999 7.23064 9.99404 8.07895 8.99994 8.07895C8.00583 8.07895 7.19994 7.23064 7.19994 6.18422C7.19994 6.0549 7.21226 5.92854 7.23571 5.80645L4.14647 3.85546C3.82416 4.13659 3.41856 4.29013 2.99998 4.28948C2.00587 4.28948 1.19998 3.44117 1.19998 2.39474C1.19998 1.34831 2.00587 0.5 2.99998 0.5C3.99408 0.5 4.79998 1.34831 4.79998 2.39474C4.79998 2.52411 4.78766 2.65041 4.7642 2.7725L7.85334 4.72361C8.17567 4.4424 8.58134 4.28881 8.99999 4.28948C9.41862 4.28881 9.82426 4.44237 10.1466 4.72355L13.2358 2.77256C13.2119 2.6482 13.1999 2.52162 13.2 2.39474C13.2 1.34831 14.0059 0.5 15 0.5Z" fill="black"/>
+    </svg>
+,    
+    path: "/analysis",
   },
 ];
 
 const ACTIVE_STYLING =
-  "bg-[#efe9ff] flex item-center gap-3 !text-blue-700 font-bold";
+  "bg-[#4FB7EF] flex item-center gap-3 !text-white font-bold";
 const HOVER_STYLING = "hover:bg-blue-700 hover:text-[#efe9ff] font-medium";
 
 // eslint-disable-next-line react/display-name
@@ -99,45 +67,41 @@ export const Sidebar = forwardRef<HTMLElement, Props>(
     return (
       <aside
         ref={ref}
-        className={`fixed overflow-y-auto overflow-hidden  h-full z-[9999] md:flex md:flex-col  bg-white shadow-sm transition-all duration-1000 md:px-5 ${
-          showNav ? "w-[100%] px-5 md:px-none md:w-[20%]" : "md:w-20 w-0"
-        }`}
+        className={`fixed overflow-y-auto overflow-hidden h-full z-[9999] md:flex md:flex-col bg-white shadow-sm transition-all duration-1000 md:px-5 ${showNav ? "w-[100%] px-5 md:px-none md:w-[20%]" : "md:w-20 w-0"
+          }`}
       >
         <div className="pt-5 pl-5">
           {/* Close button visible only on mobile screens */}
           <div className="block md:hidden">
             {showNav ? (
               <button
-                className="cursor-pointer text-gray-700 hover:text-primary transition-colors ease-in-out duration-300"
+                className="cursor-pointer text-black hover:text-primary transition-colors ease-in-out duration-300"
                 onClick={() => setShowNav((prev) => !prev)}
               >
-                <GrClose size={30} />
+                <GrClose size={24} />
               </button>
             ) : (
-              <div className="text-center hidden text-gray-700 font-bold text-xl">
+              <div className="text-center hidden text-black font-bold text-xl">
                 FS
               </div>
             )}
           </div>
         </div>
-        <div className="flex mb-14 mt-3">
+        <div className="flex mb-8 mt-3">
           {showNav ? (
-            <h2 className="font-bold text-2xl">Foxstocks</h2>
+            <img src={Logo} alt="" className="h-20" />
+
           ) : (
-            <div className="hidden md:inline-block text-center text-gray-700 font-bold text-xl">
-              FS
+            <div className="hidden md:inline-block text-center text-black font-bold text-lg">
+              <img src="assets/images/favicon.png" className="mr-3 h-5 sm:h-7" alt="Predict.if Logo" />
             </div>
           )}
         </div>
 
         <ul
-          className={`${
-            showNav ? "" : "mx-auto"
-          } flex item-center justify-center flex-col h-fit gap-5`}
+          className={`${showNav ? "" : "mx-auto"
+            } flex item-center justify-center flex-col h-fit gap-4`}
         >
-          <span className="text-gray-500 font-semibold text-md ml-2">
-            User Panel
-          </span>
           {MENU_ITEMS.map(({ name, icon: Icon, path, svg }) => (
             <li key={name.toLowerCase().replace(" ", "-")}>
               <NavLink
@@ -145,61 +109,42 @@ export const Sidebar = forwardRef<HTMLElement, Props>(
                 key={name}
                 onClick={() => setShowNav(false)}
                 className={({ isActive }) =>
-                  `${
-                    showNav ? "ml-2 px-3" : "pl-2"
-                  }  py-4 rounded-2xl text-center text-gray-500 px-5 cursor-pointer flex  items-center gap-7 transition-colors ease-in-out duration-150 ${
-                    isActive ? (showNav ? ACTIVE_STYLING : "") : HOVER_STYLING
+                  `${showNav ? "ml-2 px-3" : "pl-2"
+                  } py-3 rounded-2xl text-center text-black px-4 cursor-pointer flex items-center gap-5 transition-colors ease-in-out duration-150 ${isActive ? (showNav ? ACTIVE_STYLING : "") : HOVER_STYLING
                   }`
                 }
               >
-                {svg ? svg : <Icon className="md:h-8 h-9 md:w-8" />}
+                {svg ? (
+                  <span className="text-current">
+                    {svg}
+                  </span>
+                ) : (
+                  <Icon className="md:h-6 md:w-6 h-7 w-7" />
+                )}
                 {showNav && (
-                  <span className=" flex-shrink-0 text-center">{name}</span>
+                  <span className="flex-shrink-0 text-sm font-medium">
+                    {name}
+                  </span>
                 )}
               </NavLink>
             </li>
           ))}
         </ul>
 
-        {/* Card component at the bottom */}
-        <div
-          className={` relative  w-full items-end mt-20 mb-[85%] mx-auto p-4  space-y-3 ${
-            showNav ? "" : "hidden"
-          }`}
-        >
-          <div className="absolute w-[27.82px] h-[45.77px] bg-[#024294] z-50 opacity-50 blur-[32.5px]"></div>
-          <div className="absolute w-[240px] h-[230px] bg-[#e9ffdb] rounded-xl shadow-md shadow-black-100 drop-shadow-md">
-            <p className="text-center font-medium px-5 mt-28 text-gray-500">
-              If you aren’t willing to own a stock for 10 years, don’t even
-              think about owning it for 10 minutes.
-            </p>
-          </div>
-          <div className="absolute w-[90px] h-[90px] -top-9 left-24 bg-[#e9ffdb] rounded-full">
-            <img
-              src={bulb}
-              alt="bulb"
-              className="w-2/4 mt-5 mx-auto mb-5 shadow-sm drop-shadow-sm"
-            />
-            <span className="text-center text-xs font-bold text-gray-500">
-              Thoughts Time
-            </span>
-          </div>
-          {/* </div> */}
-        </div>
-
-        <ul className={`${showNav ? "mb-10" : "mx-auto"} `}>
+        {/* Logout button positioned at the bottom */}
+        <ul className={`${showNav ? "mb-8" : "mx-auto"} mt-auto pt-20`}>
           <li>
             <NavLink
               to="/logout"
-              className={`${
-                showNav ? "ml-2 px-3" : "pl-2"
-              } py-4 rounded-2xl text-center text-gray-500 px-5 mx-auto cursor-pointer flex items-center gap-7 transition-colors ease-in-out duration-150 ${HOVER_STYLING}`}
+              className={`${showNav ? "ml-2 px-3" : "pl-2"
+                } py-3 rounded-2xl text-center text-gray-500 px-4 mx-auto cursor-pointer flex items-center gap-5 transition-colors ease-in-out duration-150 ${HOVER_STYLING}`}
             >
-              <IoIosLogOut className="md:h-8 h-9 md:w-8" />
+              <IoIosLogOut className="md:h-6 md:w-6 h-7 w-7" />
               {showNav && (
-                  <span className=" flex-shrink-0 text-center">Logout</span>
-                )}
-              
+                <span className="flex-shrink-0 text-sm font-medium">
+                  Logout
+                </span>
+              )}
             </NavLink>
           </li>
         </ul>

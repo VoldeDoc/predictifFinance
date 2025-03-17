@@ -4,6 +4,7 @@ import { PiChatCenteredTextLight } from "react-icons/pi";
 import SavingPlan from "../Dashboard/Tools/SavingsPlan";
 import { PiAirplaneTiltThin } from "react-icons/pi";
 import TransactionsComponent from "../PrediciveAccount/compon/TransactionComponent";
+import BalanceChart from "./Component/BalanceChart";
 const Savings = () => {
     // Calculate the percentage for vacation fund
     const percentage = (3000 / 5000) * 100;
@@ -56,20 +57,22 @@ const Savings = () => {
                             </div>
                         </div>
                     </div>
-                    <div className="flex flex-col lg:flex-row gap-6">
+                    <div className="flex flex-col lg:flex-row gap-6 mt-6">
                         <div className="w-full lg:w-[30%] p-4">
                             <SavingPlan />
                         </div>
                         <div className="w-full lg:w-[70%] p-4">
                             <div className="flex flex-col lg:flex-row gap-6">
-                                <div className="w-[35%] p-4 bg-blue-300 shadow rounded-lg">
-                                    <div className="flex space-x-3">
-                                        <div className="rounded-full p-2 bg-white"><PiAirplaneTiltThin className="text-3xl text-blue-300" /></div>
-
-                                        <h3 className="font-medium text-lg mb-4">Vacation Fund</h3>
+                                <div className="w-full lg:w-[35%] p-4 bg-blue-300 shadow rounded-lg">
+                                    <div className="flex items-center space-x-3 mb-4">
+                                        <div className="rounded-full p-2 bg-white">
+                                            <PiAirplaneTiltThin className="text-3xl text-blue-300" />
+                                        </div>
+                                        <h3 className="font-medium text-lg">Vacation Fund</h3>
                                     </div>
+
                                     <div>
-                                        <h3><span className="text-lg">$3,000</span> / <span className="text-base text-gray-700">$5,000</span> </h3>
+                                        <h3><span className="text-lg">$3,000</span> / <span className="text-base text-gray-700">$5,000</span></h3>
                                     </div>
 
                                     <div className="w-full h-10 bg-blue-100 rounded-lg overflow-hidden mt-5">
@@ -78,52 +81,61 @@ const Savings = () => {
                                             style={{ width: `${percentage}%` }}
                                         ></div>
                                     </div>
-                                    <div className="flex justify-between">
+                                    <div className="flex justify-between mt-1 mb-4">
                                         <h3>In progress</h3>
                                         <h3>60%</h3>
-
                                     </div>
-                                    <div className="border-t border-red-300 px-3 my-5"></div>
-                                    <div className="flex space-x-9 py-5">
+
+                                    <div className="border-t border-red-300 my-4"></div>
+
+                                    <div className="flex justify-between py-3">
                                         <div>
                                             <h5 className="text-gray-800">Member</h5>
                                         </div>
-                                        <div className="flex flex-col">
-                                            
-                                            <div className="flex space-x-2">
-                                                <div className="bg-blue-500 p-2 rounded-full">
-
-                                                </div>
+                                        <div className="col-span-2">
+                                            <div className="flex items-center space-x-2">
+                                                <div className="bg-blue-500 p-2 rounded-full"></div>
                                                 <h5 className="text-gray-800">Andrew Forbist</h5>
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="flex space-x-9 py-5">
+
+                                    <div className="flex justify-between py-3">
                                         <div>
                                             <h5 className="text-gray-800">Due Date</h5>
                                         </div>
-                                        <div>
-                                        <h5 className="text-gray-800">31,December, 2018</h5>
+                                        <div className="col-span-2">
+                                            <h5 className="text-gray-800">31,December, 2018</h5>
                                         </div>
                                     </div>
-                                    <div className="flex space-x-9 py-5">
+
+                                    <div className="flex justify-between py-3">
                                         <div>
                                             <h5 className="text-gray-800">Remaining</h5>
                                         </div>
-                                        <div>
-                                        <h5 className="text-gray-800">95 days</h5>
+                                        <div className="col-span-2">
+                                            <h5 className="text-gray-800">95 days</h5>
                                         </div>
                                     </div>
-
                                 </div>
-                                <div className="w-[65%] p-4 bg-white shadow rounded-lg">
-
-
+                                <div className="w-full lg:w-[65%] p-4 bg-white shadow rounded-lg">
+                                    <div className="border-gray-500 rounded-xl p-4 shadow-lg my-5">
+                                        <h1 className="text-base ">Saving Tips </h1>
+                                        <ul className="list-disc list-inside ">
+                                            <li className="text-sm ">Mission: Save $21 per day for 95 days to meet goal.</li>
+                                            <li className="text-sm text-gray-500">Cut unnecessary subscriptions, save more.</li>
+                                            <li className="text-sm text-gray-500">Skip eating out twice a week.</li>
+                                            <li className="text-sm text-gray-500">Automate savings from paycheck.</li>
+                                        </ul>
+                                    </div>
+                                    <div>
+                                        <BalanceChart />
+                                    </div>
                                 </div>
                             </div>
-                           <div className="py-10">
-                           <TransactionsComponent />
-                           </div>
+                            <div className="py-10">
+                                <TransactionsComponent />
+                            </div>
                         </div>
                     </div>
                 </div>
