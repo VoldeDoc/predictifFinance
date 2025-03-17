@@ -107,7 +107,7 @@ const BalanceChart: React.FC<BalanceChartProps> = ({
       
       const tableBody = document.createElement('tbody');
       
-      bodyLines.forEach((body: any, i: number) => {
+      bodyLines.forEach((body: any, ) => {
         const value = parseFloat(body[0].split(': ')[1]);
         
         const tr = document.createElement('tr');
