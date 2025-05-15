@@ -1,4 +1,4 @@
-import {  useState } from "react";
+import {  useEffect, useState } from "react";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -8,17 +8,29 @@ import Loading from "@/utils/Loading";
 import UseFinanceHook from "@/hooks/UseFinance";
 import { questionnaire } from "./questions";
 import Question from "./questionStructure";
+import { useNavigate } from "react-router-dom";
 
 export default function Survey() {
   const [currentStep, setCurrentStep] = useState(0);
-  const { SubmitSurveyQuestion, loading } = UseFinanceHook();
+  const { SubmitSurveyQuestion, loading,getUserDetails } = UseFinanceHook();
+const router = useNavigate()
+useEffect(() => {
+  const fetchUserDetails = async () => {
+    try {
+      const userDetails = await getUserDetails();
+      const isSurveyFilled = userDetails?.data[0]?.is_questionnaire_filled;
+        if (isSurveyFilled === "yes") {
+            toast.error("You have already filled out the questionnaire.");
+            router("/dashboard");
+        }
+    } catch (error) {
+      console.error("Error fetching user details:", error);
+    }
+  }
+    fetchUserDetails();
+}
+, []);
 
-//   useEffect(() => {
-//     if (isquestionnaireFilled) {
-//       toast.info("Survey already filled");
-//       router("/dashboard");
-//     }
-//   }, [isquestionnaireFilled, router]);
 
   const handlePreviousClick = () => {
     setCurrentStep((prevStep) => Math.max(prevStep - 1, 0));

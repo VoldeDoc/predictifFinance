@@ -35,9 +35,36 @@ const UseFinanceHook = () => {
         }
     }
 
+    const getUserDetails = async () => {
+        try {
+            const token = localStorage.getItem("token");
+            if (!token) {
+                router("/auth/signup");
+                return Promise.reject("Authentication required to change password");
+            }
+            setLoading(true);
+            const response = await client.get("/getUserDetails", {
+                headers: {
+                    Authorization: `Bearer ${JSON.parse(token)}`
+                }
+            })
+            return Promise.resolve(response.data);
+        }
+        catch (error: any) {
+            const resError = error.response?.data;
+            const errorMessage = resError?.message || resError?.data;
+            console.log(errorMessage);
+            return Promise.reject(errorMessage || "Failed to submit survey");
+        }
+        finally {
+            setLoading(false);
+        }
+    }
+
     return {
         loading,
-        SubmitSurveyQuestion
+        SubmitSurveyQuestion,
+        getUserDetails
     }
 
 }
