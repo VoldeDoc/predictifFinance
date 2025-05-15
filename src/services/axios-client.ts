@@ -1,6 +1,6 @@
 import axios, { AxiosInstance, AxiosError, AxiosResponse } from "axios";
 
-const apiURL = import.meta.env.VITE_BASE_URL;
+const apiURL = import.meta.env.VITE_BASE_URL ;
 
 
 const axiosClient = (token: string | null = null): AxiosInstance => {

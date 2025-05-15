@@ -1,5 +1,5 @@
 import { Dispatch, forwardRef, SetStateAction } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { GrClose } from "react-icons/gr";
 import { MdDashboard } from "react-icons/md";
 import { IoIosLogOut } from "react-icons/io";
@@ -7,6 +7,9 @@ import { FaSackDollar } from "react-icons/fa6";
 import { PiHeadCircuitThin } from "react-icons/pi";
 import Logo from "../../../../public/assets/images/dashboard/dashboard/Transparent Logo 1.svg";
 import { NewspaperIcon } from "@heroicons/react/24/solid";
+import UserAuthentication from "@/hooks/UseAuth";
+import { toast } from "react-toastify";
+
 type Props = {
   showNav: boolean;
   setShowNav: Dispatch<SetStateAction<boolean>>;
@@ -50,9 +53,8 @@ const MENU_ITEMS = [
   {
     name: "Analysis",
     svg: <svg width="24" height="25" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path fill-rule="evenodd" clip-rule="evenodd" d="M18.6 13.1316C21.5823 13.1316 24 15.6765 24 18.8158C24 21.9551 21.5823 24.5 18.6 24.5C15.6176 24.5 13.2 21.9551 13.2 18.8158C13.2 15.6765 15.6176 13.1316 18.6 13.1316ZM16.8 15.6579V21.9737L22.2 18.8158L16.8 15.6579ZM12.2484 16.921C12.0831 17.5376 11.9995 18.1752 12 18.8158C12 19.0287 12.0091 19.2394 12.0269 19.4475L0 19.4474V16.921H12.2484ZM4.79998 6.81581V15.6579H1.19998V6.81581H4.79998ZM10.8 10.6053V15.6579H7.19999V10.6053H10.8ZM16.8 9.34209L16.7999 12.13C15.3252 12.569 14.0604 13.5341 13.1998 14.8205L13.2 9.34209H16.8ZM22.8 10.6053L22.8001 13.4565C21.8036 12.5903 20.5614 12.0259 19.2001 11.8967L19.2 10.6053H22.8ZM15 0.5C15.9941 0.5 16.8 1.34831 16.8 2.39474C16.8 2.42055 16.7995 2.44621 16.7985 2.47171L19.6472 3.67114C19.9771 3.27585 20.4608 3.02634 21 3.02634C21.9941 3.02634 22.8 3.87465 22.8 4.92108C22.8 5.9675 21.9941 6.81581 21 6.81581C20.0059 6.81581 19.2 5.9675 19.2 4.92108C19.2 4.89526 19.2005 4.86956 19.2014 4.84398L16.3529 3.64456C16.023 4.0399 15.5391 4.28948 15 4.28948C14.5811 4.29014 14.1753 4.13642 13.8529 3.85499L10.7641 5.80627C10.7876 5.92843 10.7999 6.05478 10.7999 6.18422C10.7999 7.23064 9.99404 8.07895 8.99994 8.07895C8.00583 8.07895 7.19994 7.23064 7.19994 6.18422C7.19994 6.0549 7.21226 5.92854 7.23571 5.80645L4.14647 3.85546C3.82416 4.13659 3.41856 4.29013 2.99998 4.28948C2.00587 4.28948 1.19998 3.44117 1.19998 2.39474C1.19998 1.34831 2.00587 0.5 2.99998 0.5C3.99408 0.5 4.79998 1.34831 4.79998 2.39474C4.79998 2.52411 4.78766 2.65041 4.7642 2.7725L7.85334 4.72361C8.17567 4.4424 8.58134 4.28881 8.99999 4.28948C9.41862 4.28881 9.82426 4.44237 10.1466 4.72355L13.2358 2.77256C13.2119 2.6482 13.1999 2.52162 13.2 2.39474C13.2 1.34831 14.0059 0.5 15 0.5Z" fill="black"/>
-    </svg>
-,    
+    <path fillRule="evenodd" clipRule="evenodd" d="M18.6 13.1316C21.5823 13.1316 24 15.6765 24 18.8158C24 21.9551 21.5823 24.5 18.6 24.5C15.6176 24.5 13.2 21.9551 13.2 18.8158C13.2 15.6765 15.6176 13.1316 18.6 13.1316ZM16.8 15.6579V21.9737L22.2 18.8158L16.8 15.6579ZM12.2484 16.921C12.0831 17.5376 11.9995 18.1752 12 18.8158C12 19.0287 12.0091 19.2394 12.0269 19.4475L0 19.4474V16.921H12.2484ZM4.79998 6.81581V15.6579H1.19998V6.81581H4.79998ZM10.8 10.6053V15.6579H7.19999V10.6053H10.8ZM16.8 9.34209L16.7999 12.13C15.3252 12.569 14.0604 13.5341 13.1998 14.8205L13.2 9.34209H16.8ZM22.8 10.6053L22.8001 13.4565C21.8036 12.5903 20.5614 12.0259 19.2001 11.8967L19.2 10.6053H22.8ZM15 0.5C15.9941 0.5 16.8 1.34831 16.8 2.39474C16.8 2.42055 16.7995 2.44621 16.7985 2.47171L19.6472 3.67114C19.9771 3.27585 20.4608 3.02634 21 3.02634C21.9941 3.02634 22.8 3.87465 22.8 4.92108C22.8 5.9675 21.9941 6.81581 21 6.81581C20.0059 6.81581 19.2 5.9675 19.2 4.92108C19.2 4.89526 19.2005 4.86956 19.2014 4.84398L16.3529 3.64456C16.023 4.0399 15.5391 4.28948 15 4.28948C14.5811 4.29014 14.1753 4.13642 13.8529 3.85499L10.7641 5.80627C10.7876 5.92843 10.7999 6.05478 10.7999 6.18422C10.7999 7.23064 9.99404 8.07895 8.99994 8.07895C8.00583 8.07895 7.19994 7.23064 7.19994 6.18422C7.19994 6.0549 7.21226 5.92854 7.23571 5.80645L4.14647 3.85546C3.82416 4.13659 3.41856 4.29013 2.99998 4.28948C2.00587 4.28948 1.19998 3.44117 1.19998 2.39474C1.19998 1.34831 2.00587 0.5 2.99998 0.5C3.99408 0.5 4.79998 1.34831 4.79998 2.39474C4.79998 2.52411 4.78766 2.65041 4.7642 2.7725L7.85334 4.72361C8.17567 4.4424 8.58134 4.28881 8.99999 4.28948C9.41862 4.28881 9.82426 4.44237 10.1466 4.72355L13.2358 2.77256C13.2119 2.6482 13.1999 2.52162 13.2 2.39474C13.2 1.34831 14.0059 0.5 15 0.5Z" fill="black"/>
+    </svg>,    
     path: "/analysis",
   },
 ];
@@ -64,6 +66,44 @@ const HOVER_STYLING = "hover:bg-blue-700 hover:text-[#efe9ff] font-medium";
 // eslint-disable-next-line react/display-name
 export const Sidebar = forwardRef<HTMLElement, Props>(
   ({ showNav, setShowNav }, ref) => {
+    const { Logout } = UserAuthentication();
+    const navigate = useNavigate();
+
+    const handleLogout = async (e: React.MouseEvent) => {
+      e.preventDefault(); // Prevent navigation
+      
+      // Create a toast ID for the loading state
+      const toastId = toast.loading('Logging out...');
+      
+      try {
+        // Call the Logout function from UserAuthentication
+        await Logout();
+        
+        // Show success toast and update the loading toast
+        toast.update(toastId, { 
+          render: 'Logged out successfully', 
+          type: 'success',
+          isLoading: false,
+          autoClose: 2000
+        });
+        
+        // Add a small delay before navigation for better UX
+        setTimeout(() => {
+          navigate("/auth/signin");
+        }, 500);
+      } catch (error) {
+        console.error("Logout failed:", error);
+        
+        // Show error toast and update the loading toast
+        toast.update(toastId, { 
+          render: error instanceof Error ? error.message : 'Failed to logout. Please try again.',
+          type: 'error',
+          isLoading: false,
+          autoClose: 3000
+        });
+      }
+    };
+
     return (
       <aside
         ref={ref}
@@ -90,7 +130,6 @@ export const Sidebar = forwardRef<HTMLElement, Props>(
         <div className="flex mb-8 mt-3">
           {showNav ? (
             <img src={Logo} alt="" className="h-20" />
-
           ) : (
             <div className="hidden md:inline-block text-center text-black font-bold text-lg">
               <img src="assets/images/favicon.png" className="mr-3 h-5 sm:h-7" alt="Predict.if Logo" />
@@ -119,7 +158,7 @@ export const Sidebar = forwardRef<HTMLElement, Props>(
                     {svg}
                   </span>
                 ) : (
-                  <Icon className="md:h-6 md:w-6 h-7 w-7" />
+                  Icon && <Icon className="md:h-6 md:w-6 h-7 w-7" />
                 )}
                 {showNav && (
                   <span className="flex-shrink-0 text-sm font-medium">
@@ -131,13 +170,13 @@ export const Sidebar = forwardRef<HTMLElement, Props>(
           ))}
         </ul>
 
-        {/* Logout button positioned at the bottom */}
+        {/* Logout button positioned at the bottom with onClick handler */}
         <ul className={`${showNav ? "mb-8" : "mx-auto"} mt-auto pt-20`}>
           <li>
-            <NavLink
-              to="/logout"
+            <button
+              onClick={handleLogout}
               className={`${showNav ? "ml-2 px-3" : "pl-2"
-                } py-3 rounded-2xl text-center text-gray-500 px-4 mx-auto cursor-pointer flex items-center gap-5 transition-colors ease-in-out duration-150 ${HOVER_STYLING}`}
+                } py-3 rounded-2xl text-center text-gray-500 px-4 mx-auto cursor-pointer flex items-center gap-5 transition-colors ease-in-out duration-150 w-full ${HOVER_STYLING}`}
             >
               <IoIosLogOut className="md:h-6 md:w-6 h-7 w-7" />
               {showNav && (
@@ -145,7 +184,7 @@ export const Sidebar = forwardRef<HTMLElement, Props>(
                   Logout
                 </span>
               )}
-            </NavLink>
+            </button>
           </li>
         </ul>
       </aside>

@@ -1,26 +1,28 @@
 import React, { useState, useRef, useEffect } from "react";
 import Button from "../Ui/Button";
-import { logo, otp_verification } from "../../../public"; // Make sure these imports are correct
-import axiosClient from "@/services/axios-client";
+import { logo, otp_verification } from "../../../public";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { AppDispatch } from "@/context/store";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { setToken, setUser } from "./store";
-import { RootState } from "@/context/store/rootReducer";
+import UserAuthentication from "@/hooks/UseAuth";
 
 const OtpVerification = () => {
-  const client = axiosClient();
+  const { ResendOtp, VerifyOtp } = UserAuthentication()
   const dispatch = useDispatch<AppDispatch>();
   const router = useNavigate();
   const [otp, setOtp] = useState(["", "", "", ""]);
   const [isInvalid, setIsInvalid] = useState(false);
   const [fadeOut, setFadeOut] = useState([false, false, false, false]);
-  const [timeLeft, setTimeLeft] = useState(180); // 3 minutes countdown
+  const [timeLeft, setTimeLeft] = useState(12);
   const [canResend, setCanResend] = useState(false);
-  const inputsRef = useRef<HTMLInputElement[]>([]);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const location = useLocation();
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  const otpMail = useSelector((state: RootState) => state.auth.otp_mail);
+  const email = location.state?.email;
+ 
 
   useEffect(() => {
     if (timeLeft > 0) {
@@ -31,43 +33,91 @@ const OtpVerification = () => {
     }
   }, [timeLeft]);
 
-  // Handle OTP input change
-  const handleChange = (index: number, value: string) => {
-    if (/^\d$/.test(value) || value === "") {
+  // Automatically focus the first input on component mount
+  useEffect(() => {
+    if (containerRef.current) {
+      containerRef.current.focus();
+    }
+  }, []);
+
+  // Handle key press for the entire OTP container
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    e.preventDefault();
+
+    const key = e.key;
+
+    // Handle digit input
+    if (/^\d$/.test(key)) {
       const newOtp = [...otp];
-      newOtp[index] = value;
+
+      // Find the first empty slot or the current active one
+      let targetIndex = otp.findIndex(val => val === '');
+      // Use active index if no empty slot found or ensure we use valid index 
+      if (targetIndex === -1) targetIndex = Math.min(activeIndex, 3);
+
+      newOtp[targetIndex] = key;
       setOtp(newOtp);
 
-      // Move to the next input if the current one is filled
-      if (value !== "" && index < 3) {
-        inputsRef.current[index + 1].focus();
+      // Move to next input if not at the last one
+      if (targetIndex < 3) {
+        setActiveIndex(targetIndex + 1);
       }
+    }
+    // Handle backspace
+    else if (key === 'Backspace') {
+      const newOtp = [...otp];
+
+      // If current position has a value, clear it
+      if (newOtp[activeIndex]) {
+        newOtp[activeIndex] = '';
+      }
+      // Otherwise move to previous position and clear it
+      else if (activeIndex > 0) {
+        const newIndex = activeIndex - 1;
+        newOtp[newIndex] = '';
+        setActiveIndex(newIndex);
+      }
+
+      setOtp(newOtp);
+    }
+    // Add arrow key navigation
+    else if (key === 'ArrowRight' && activeIndex < 3) {
+      setActiveIndex(activeIndex + 1);
+    }
+    else if (key === 'ArrowLeft' && activeIndex > 0) {
+      setActiveIndex(activeIndex - 1);
     }
   };
 
-  // Handle backspace key to move focus to the previous input
-  const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Backspace" && otp[index] === "" && index > 0) {
-      inputsRef.current[index - 1].focus();
-    }
+  // Visual indicator for which box is active
+  const getInputClass = (index: number, value: string) => {
+    return `w-12 h-12 text-center text-xl border rounded-md transition-all duration-150 flex items-center justify-center
+      ${value ? "border-primary focus:ring-secondary ring-2 focus:ring-2" : "border-gray-300"}
+      ${index === activeIndex ? "ring-2 ring-primary" : ""}
+      ${fadeOut[index] ? "opacity-0 transition-opacity duration-300" : ""}`;
   };
 
   const handleSubmit = async () => {
     const enteredOtp = otp.join("");
+    if (enteredOtp.length !== 4) {
+      toast.error("Please enter all 4 digits");
+      return;
+    }
+
+    if (!email) {
+      toast.error("Email is not provided. Please try again.");
+      return;
+    }
+
     try {
-      const client = axiosClient();
-     const res = await client.post("/auth/verify-otp", {
-        email: otpMail,
-        otp: enteredOtp,
-      });
-      const token = res.data.data.token
-      const user = res.data.data.user
+      const response = await VerifyOtp({ email: email, otp: enteredOtp });
+      const token = response.data.token;
+      const user = response.data.user;
       setIsInvalid(false);
       dispatch(setToken(token));
       dispatch(setUser(user));
-      router("/dashboard");
-      toast.success("OTP verified successfully!");
-      // Redirect or update state as needed
+      router("/survey");
+      toast.success("OTP verified successfully! Fill Survey to continue");
     } catch (error: any) {
       if (error.response?.data?.message) {
         toast.error(error.response?.data?.message);
@@ -78,27 +128,26 @@ const OtpVerification = () => {
       handleError();
     }
   };
-
-
-
-  const handleResend = async () => {
-    if (canResend) {
-      try {
-      
-        const res = await client.post("/auth/resend-otp", { email: otpMail });
-        const otp = res.data.data.otp;
-        toast.success(`OTP resent successfully! = > ${otp}`);
-        setTimeLeft(180);
-        setCanResend(false);
-      } catch (error:any) {
-        if (error.response?.data?.data) {
-          toast.error( error.response?.data?.data);
-        } else {
-          toast.error("An unexpected error occurred. Please try again.");
-        }
+const handleResend = async () => {
+  if (canResend) {
+    if (!email) {
+      toast.error("Email is not provided. Please try again.");
+      return;
+    }
+    try {
+      await ResendOtp(email, "register");
+      toast.success(`OTP resent successfully`);
+      setTimeLeft(120); // Reset to 2 minutes after resend
+      setCanResend(false);
+    } catch (error: any) {
+      if (error.response?.data?.data) {
+        toast.error(error.response?.data?.data);
+      } else {
+        toast.error("An unexpected error occurred. Please try again.");
       }
     }
-  };
+  }
+};
 
   const handleError = () => {
     setIsInvalid(true);
@@ -119,7 +168,7 @@ const OtpVerification = () => {
       setIsInvalid(false);
       setOtp(["", "", "", ""]);
       setFadeOut([false, false, false, false]);
-      inputsRef.current[0].focus();
+      setActiveIndex(0);
     }, 1000);
   };
 
@@ -127,6 +176,15 @@ const OtpVerification = () => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
     return `${minutes}:${remainingSeconds < 10 ? "0" : ""}${remainingSeconds}`;
+  };
+
+  // Keep focus on container even if clicked outside
+  const handleBlur = () => {
+    setTimeout(() => {
+      if (containerRef.current) {
+        containerRef.current.focus();
+      }
+    }, 10);
   };
 
   return (
@@ -141,40 +199,35 @@ const OtpVerification = () => {
             We sent a code to your email address.
           </h1>
         </div>
+
+        {/* OTP input container - tab index makes it focusable */}
         <div
-          className={`flex md:justify-start justify-center items-center w-full gap-10 mt-4 ${
-            isInvalid ? "animate-vibrate" : ""
-          }`}
+          ref={containerRef}
+          tabIndex={0}
+          onKeyDown={handleKeyDown}
+          onBlur={handleBlur}
+          className={`flex md:justify-start justify-center items-center w-full gap-10 mt-4 outline-none ${isInvalid ? "animate-vibrate" : ""
+            }`}
         >
           {otp.map((value, index) => (
-            <input
+            <div
               key={index}
-              ref={(el) => (inputsRef.current[index] = el!)}
-              type="text"
-              maxLength={1}
-              value={value}
-              onChange={(e) => handleChange(index, e.target.value)}
-              onKeyDown={(e) => handleKeyDown(index, e)}
-              className={`w-12 h-12 text-center text-xl border rounded-md transition-all duration-150 ${
-                value
-                  ? "border-primary focus:ring-secondary ring-2 focus:ring-2"
-                  : "border-gray-300"
-              } ${
-                fadeOut[index]
-                  ? "opacity-0 transition-opacity duration-300"
-                  : ""
-              }`}
-            />
+              className={getInputClass(index, value)}
+              onClick={() => setActiveIndex(index)}
+            >
+              {value}
+            </div>
           ))}
         </div>
+
         <div className="flex items-start gap-3 w-full pl-5 md:pl-0">
           <span className="font-bold">{formatTime(timeLeft)}</span>
         </div>
         <div className="flex items-start gap-3 w-full pl-5 md:pl-0 ">
-          <span className="font-medium">Didn’t get a code ? </span>
+          <span className="font-medium">Didn't get a code ? </span>
           <button
             onClick={handleResend}
-            className={`font-bold ${canResend ? "" : "text-gray-500 cursor-not-allowed"}`}
+            className={`font-bold ${canResend ? "text-primary hover:underline" : "text-gray-500 cursor-not-allowed"}`}
             disabled={!canResend}
           >
             Resend

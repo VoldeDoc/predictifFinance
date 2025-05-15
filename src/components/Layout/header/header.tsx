@@ -4,7 +4,6 @@ import {
   ChevronDownIcon,
   CogIcon,
   CreditCardIcon,
-  PencilIcon,
   XMarkIcon,
 } from "@heroicons/react/24/solid";
 import { Menu, Popover, Transition } from "@headlessui/react";
@@ -18,6 +17,7 @@ import {
 } from "react-icons/tb";
 import { useSelector } from "react-redux";
 import { RootState } from "@/context/store/rootReducer";
+import { CgPassword } from "react-icons/cg";
 
 type Props = {
   showNav: boolean;
@@ -152,19 +152,7 @@ export const Header = ({ showNav, setShowNav }: Props) => {
                 }
               >
                 <div className="p-1">
-                  <Menu.Item>
-                    <Link
-                      to={"/profile"}
-                      className={
-                        "flex items-center gap-2 rounded p-2 transition-colors ease-in-out duration-150 text-gray-700 hover:bg-gray-100 group"
-                      }
-                    >
-                      <PencilIcon className={"h-4 w-4 text-gray-700"} />
-                      <span className={"group-hover:text-orange-500"}>
-                        Edit profile
-                      </span>
-                    </Link>
-                  </Menu.Item>
+               
                   <Menu.Item>
                     <Link
                       to={"/credit"}
@@ -175,6 +163,19 @@ export const Header = ({ showNav, setShowNav }: Props) => {
                       <CreditCardIcon className={"h-4 w-4 text-gray-700"} />
                       <span className={"group-hover:text-orange-500"}>
                         Credit card
+                      </span>
+                    </Link>
+                  </Menu.Item>
+                  <Menu.Item>
+                    <Link
+                      to={"/auth/change-pwd"}
+                      className={
+                        "flex items-center gap-2 rounded p-2 transition-colors ease-in-out duration-150 text-gray-700 hover:bg-gray-100 group"
+                      }
+                    >
+                      <CgPassword className={"h-4 w-4 text-gray-700"} />
+                      <span className={"group-hover:text-orange-500"}>
+                        Change Password
                       </span>
                     </Link>
                   </Menu.Item>

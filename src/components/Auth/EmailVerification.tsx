@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import BrandCarousel from "../Home/Tools/BrandCarousel";
 
-export default function EmailVerification() {
+export default function ForgetPasswordMail() {
   return (
     <div className="min-h-screen flex flex-col sm:flex-row">
       {/* Left Section (Form) */}
