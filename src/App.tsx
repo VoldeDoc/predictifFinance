@@ -31,6 +31,7 @@ import ResetPassword from "./components/Auth/ResetPassword";
 import ChangePasswordEmail from "./components/Auth/ChangePasswordMail";
 import ChangePasswordPage from "./components/Auth/ChangePassword";
 import Survey from "./components/Survey/survey";
+import KycForm from "./components/Survey/kyc";
 
 
 function App() {
@@ -65,6 +66,7 @@ function App() {
               <Route path="/auth/forget-pwd" element={<ForgetPasswordEmail />} />
               <Route path="/auth/forget-pwd-verification" element={<ResetPassword />} />
               <Route path="/survey" element={<Survey />} />
+              <Route path="/kyc" element={<ProtectedRoute><KycForm /></ProtectedRoute>} />
 
               {/* Auth Pages */}
               <Route path="/auth/change-pwd" element={<ProtectedRoute><ChangePasswordEmail /></ProtectedRoute>} />

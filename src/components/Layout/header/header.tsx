@@ -155,14 +155,14 @@ export const Header = ({ showNav, setShowNav }: Props) => {
                
                   <Menu.Item>
                     <Link
-                      to={"/credit"}
+                      to={"/kyc"}
                       className={
                         "flex items-center gap-2 rounded p-2 transition-colors ease-in-out duration-150 text-gray-700 hover:bg-gray-100 group"
                       }
                     >
                       <CreditCardIcon className={"h-4 w-4 text-gray-700"} />
                       <span className={"group-hover:text-orange-500"}>
-                        Credit card
+                        kyc
                       </span>
                     </Link>
                   </Menu.Item>

@@ -92,3 +92,13 @@ export interface CardProps {
     additional_comment_ai: string; // Additional comments on events and AI
     additional_comment_preference: string; // Additional comments on investment preferences
   }
+
+  export interface KycItem {
+  type: 'text' | 'file';  // Type of the KYC field
+  key: string;           // Key like "label", "detail", etc.
+  value: string | File;  // The value (text or file)
+}
+
+export interface KycData {
+  kyc: KycItem[];
+}
