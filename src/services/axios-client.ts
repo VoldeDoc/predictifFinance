@@ -1,6 +1,9 @@
 import axios, { AxiosInstance, AxiosError, AxiosResponse } from "axios";
 
-const apiURL = import.meta.env.VITE_BASE_URL ;
+const apiURL = import.meta.env.VITE_BASE_URL || "https://dash.predictif.ai/api" ;
+
+console.log("API URL:", apiURL);
+
 
 
 const axiosClient = (token: string | null = null): AxiosInstance => {
