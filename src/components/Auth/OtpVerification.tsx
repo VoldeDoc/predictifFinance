@@ -15,7 +15,7 @@ const OtpVerification = () => {
   const [otp, setOtp] = useState(["", "", "", ""]);
   const [isInvalid, setIsInvalid] = useState(false);
   const [fadeOut, setFadeOut] = useState([false, false, false, false]);
-  const [timeLeft, setTimeLeft] = useState(12);
+  const [timeLeft, setTimeLeft] = useState(120);
   const [canResend, setCanResend] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const location = useLocation();
