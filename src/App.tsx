@@ -32,6 +32,18 @@ import ChangePasswordEmail from "./components/Auth/ChangePasswordMail";
 import ChangePasswordPage from "./components/Auth/ChangePassword";
 import Survey from "./components/Survey/survey";
 import KycForm from "./components/Survey/kyc";
+import Forum from "./components/Forum/Forum";
+import MessageBox from "./components/ForumGroup/Groip/messageBox";
+import ForumGroup from "./components/ForumGroup/ForumGroup";
+import CreateGroupPage from "./components/ForumGroup/Groip/createGroup";
+import UserGroupPage from "./components/ForumGroup/GetUserGroup/GetuserGroup";
+import GroupSettingsPage from "./components/ForumGroup/Groip/GroupSettings";
+import AllGroupsPage from "./components/ForumGroup/AllGroup/AllGroup";
+import UpdateGroupPage from "./components/ForumGroup/Groip/updateGroup";
+import AddMembersPage from "./components/ForumGroup/Groip/AddMember";
+import AllUsersPage from "./components/ForumGroup/Groip/AllUsers";
+import RemoveMember from "./components/ForumGroup/Groip/TemoveMember";
+import AssignRolesPage from "./components/ForumGroup/Groip/AssignRole";
 
 
 function App() {
@@ -87,6 +99,25 @@ function App() {
               <Route path="/market-news/details" element={<ProtectedRoute><MarketNewsDetails /></ProtectedRoute>} />
               <Route path="/analysis/details" element={<ProtectedRoute><AnalysisDetailsPage /></ProtectedRoute>} />
               <Route path="/analysis" element={<ProtectedRoute><Analysis /></ProtectedRoute>} />
+
+
+              {/* Forum */}
+              <Route path="/forum" element={<ProtectedRoute><Forum /></ProtectedRoute>} />
+
+              <Route path="/forum/messages/:id" element={<ProtectedRoute><MessageBox /></ProtectedRoute>} />
+              
+              <Route path="/groups" element={<ProtectedRoute><ForumGroup /></ProtectedRoute>} />
+              <Route path="/create-group" element={<ProtectedRoute><CreateGroupPage /></ProtectedRoute>} />
+                 <Route path="/user/user-group/:id" element={<ProtectedRoute><UserGroupPage /></ProtectedRoute>} />
+
+              <Route path="/user/settings/:id" element=
+                {<ProtectedRoute><GroupSettingsPage /></ProtectedRoute>} />
+              <Route path="/user/all-groups" element={<ProtectedRoute><AllGroupsPage /></ProtectedRoute>} />
+              <Route path="/user/update-group/:id" element={<ProtectedRoute><UpdateGroupPage /></ProtectedRoute>} />
+              <Route path="/user/add-members/:id" element={<ProtectedRoute><AddMembersPage /></ProtectedRoute>} />
+              <Route path="/user/role/:id" element={<ProtectedRoute><AssignRolesPage /></ProtectedRoute>} />
+              <Route path="/user/all-users/:id" element={<ProtectedRoute><AllUsersPage /></ProtectedRoute>} />
+              <Route path="/user/remove-users/:id" element={<ProtectedRoute><RemoveMember /></ProtectedRoute>} />
 
 
               {/* Ui */}

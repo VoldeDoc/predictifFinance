@@ -102,3 +102,45 @@ export interface CardProps {
 export interface KycData {
   kyc: KycItem[];
 }
+
+  export interface createGroupValues{
+    name:string;
+    description:string;
+  }
+
+  export interface sendMessageValues{
+    group_id : number;
+    message : string;
+  }
+
+
+  export interface editMessageValues{
+    group_id : number;
+    message : string;
+    message_id : number;
+  }
+
+  export interface deleteMessageValues{
+    group_id:number
+  }
+
+  export interface addMembersValues{
+  group_id:number;
+  user_id:number[];
+  }
+
+  export interface UserRole {
+    user_id: number;
+    role: string;
+}
+
+export interface AssignMemberRoleValues {
+    group_id: number;
+    user_role: UserRole[];
+}
+
+export interface deleteMessageValues {
+    group_id: number;
+    message_id: number;
+    delete_type: string;
+}

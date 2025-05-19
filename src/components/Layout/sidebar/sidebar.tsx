@@ -57,6 +57,11 @@ const MENU_ITEMS = [
     </svg>,    
     path: "/analysis",
   },
+   {
+    name: "Forum",
+    icon: NewspaperIcon,
+    path: "/forum",
+  },
 ];
 
 const ACTIVE_STYLING =
