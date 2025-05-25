@@ -44,6 +44,9 @@ import AddMembersPage from "./components/ForumGroup/Groip/AddMember";
 import AllUsersPage from "./components/ForumGroup/Groip/AllUsers";
 import RemoveMember from "./components/ForumGroup/Groip/TemoveMember";
 import AssignRolesPage from "./components/ForumGroup/Groip/AssignRole";
+import Strategies from "./components/Strategy/strategies";
+import Profile from "./components/Profile/profile";
+import ForgetPwdOtpVerification from "./components/Auth/ForgetPwdOtpVerification";
 
 
 function App() {
@@ -76,7 +79,8 @@ function App() {
               <Route path="/auth/signup" element={<Signup />} />
               <Route path="/auth/otp-verification" element={<OtpVerification />} />
               <Route path="/auth/forget-pwd" element={<ForgetPasswordEmail />} />
-              <Route path="/auth/forget-pwd-verification" element={<ResetPassword />} />
+              <Route path="/auth/forget-otp-verification" element={<ForgetPwdOtpVerification />} />
+              <Route path="/auth/reset-forget-pwd" element={<ResetPassword />} />
               <Route path="/survey" element={<Survey />} />
               <Route path="/kyc" element={<ProtectedRoute><KycForm /></ProtectedRoute>} />
 
@@ -100,6 +104,9 @@ function App() {
               <Route path="/analysis/details" element={<ProtectedRoute><AnalysisDetailsPage /></ProtectedRoute>} />
               <Route path="/analysis" element={<ProtectedRoute><Analysis /></ProtectedRoute>} />
 
+
+              <Route path="/strategies" element={<ProtectedRoute><Strategies /></ProtectedRoute>} />
+              <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
 
               {/* Forum */}
               <Route path="/forum" element={<ProtectedRoute><Forum /></ProtectedRoute>} />

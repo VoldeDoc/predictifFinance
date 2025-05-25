@@ -15,12 +15,6 @@ const schema = yup.object().shape({
     .string()
     .email("Invalid email format")
     .required("Email is required"),
-  otp: yup
-    .string()
-    .required("OTP is required")
-    .matches(/^[0-9]+$/, "Must be only digits")
-    .min(4, "OTP must be at least 4 characters")
-    .max(6, "OTP cannot exceed 6 characters"),
   new_password: yup
     .string()
     .required("Password is required")
@@ -38,7 +32,6 @@ const schema = yup.object().shape({
 // Define the form values interface
 interface FormValues {
   email: string;
-  otp: string;
   new_password: string;
   new_password_confirmation: string;
 }
@@ -85,7 +78,7 @@ const ResetPassword = () => {
   // Handler for form submission
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     toast.promise(
-      await ResetForgetPwd(data),
+       ResetForgetPwd(data),
         {
             pending: "Changing password...",
             success: {
@@ -130,15 +123,7 @@ const ResetPassword = () => {
             readOnly={!!email}
           />
           
-          <Textinput
-            type="text"
-            label="OTP Code"
-            className="h-16 w-full"
-            placeholder="Enter OTP sent to your email"
-            register={register}
-            name="otp"
-            error={errors.otp}
-          />
+       
           
           <Textinput
             type="password"

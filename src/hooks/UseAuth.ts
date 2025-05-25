@@ -132,7 +132,7 @@ const UserAuthentication = () => {
                 email: email,
                 action: action
             });
-            router("/auth/forget-pwd-verification", { state: { email: email } });
+            router("/auth/forget-otp-verification", { state: { email: email } });
             return Promise.resolve(response.data.message || "Otp sent to mail");
         } catch (error: any) {
             const resError = error.response?.data;
@@ -196,10 +196,37 @@ const UserAuthentication = () => {
         }
     };
 
+
+
+       const VerifyOtpForgetpwd = async (data: { email: string, otp: string }) => {
+        try {
+            setLoading(true);
+            const response = await client.post("/verifyOtp", {
+                email: data.email,
+                otp: data.otp
+            });
+
+            // if (response.data.token) {
+            //     dispatch(setToken(response.data.token));
+            //     dispatch(setUser(response.data.user));
+            // }
+            router("/auth/reset-forget-pwd", { state: { email: data.email } });
+            return Promise.resolve(response.data.message || "OTP verified successfully");
+        } catch (error: any) {
+            const resError = error.response?.data;
+            const errorMessage = resError?.message || resError?.data;
+            console.log(errorMessage);
+            return Promise.reject(errorMessage || "Failed to verify OTP");
+        } finally {
+            setLoading(false);
+        }
+    }
+
     const ResetForgetPwd = async (data: { email: string, new_password: string, new_password_confirmation: string }) => {
         try {
             setLoading(true);
             const response = await client.post("/resetForgetPassword", data);
+            console.log(response)
             router("/auth/signin");
             return Promise.resolve(response.data.message || "Password reset successfully");
         } catch (error: any) {
@@ -212,6 +239,8 @@ const UserAuthentication = () => {
         }
     }
 
+  
+
     return {
         loading,
         UserSignup,
@@ -223,6 +252,8 @@ const UserAuthentication = () => {
         ResetForgetPwd,
         ChangePasswordMail,
         ChangePassword,
+        VerifyOtpForgetpwd,
+
     }
 
 }

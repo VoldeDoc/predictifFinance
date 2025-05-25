@@ -1,7 +1,7 @@
 import axiosClient from "@/services/axios-client";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { addMembersValues, AssignMemberRoleValues, createGroupValues, deleteMessageValues, editMessageValues, KycData, sendMessageValues, SurveyDataValues ,  } from "@/types";
+import { addMembersValues, AssignMemberRoleValues, createGroupValues, createStrategyValues, deleteMessageValues, editMessageValues, KycData, sendMessageValues, SurveyDataValues ,  } from "@/types";
 import { toast } from "react-toastify";
 import { RootState } from "@/context/store/rootReducer";
 import { useSelector } from "react-redux";
@@ -68,49 +68,50 @@ const UseFinanceHook = () => {
         }
     }
 
-const SubmitKyc = async (data: KycData) => {
-    try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-            router("/auth/signup");
-            return Promise.reject("Authentication required for KYC submission");
+  const SubmitKyc = async (data: KycData) => {
+        try {
+            const token = localStorage.getItem("token");
+            if (!token) {
+                router("/auth/signup");
+                return Promise.reject("Authentication required for KYC submission");
+            }
+            
+            // Create FormData to properly handle file upload
+            const formData = new FormData();
+            
+            // Add each KYC item to the formData with the proper array index notation
+            data.kyc.forEach((item, index) => {
+                if (item.type === 'file' && item.value instanceof File) {
+                    formData.append(`kyc[${index}][${item.key}]`, item.value);
+                    formData.append(`kyc[${index}][type]`, item.type);
+                } else if (item.type === 'text') {
+                    formData.append(`kyc[${index}][${item.key}]`, item.value.toString());
+                    formData.append(`kyc[${index}][type]`, item.type);
+                }
+            });
+            
+            setLoading(true);
+            const response = await client.post("/user/kycuser", formData, {
+                headers: {
+                    Authorization: `Bearer ${JSON.parse(token)}`,
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+            
+            console.log("KYC submission successful:", response.data);
+            router("/dashboard");
+            return Promise.resolve("KYC completed successfully");
         }
-        
-        // Create FormData to properly handle file upload
-        const formData = new FormData();
-        
-        // Add each KYC item to the formData with the proper array index
-        data.kyc.forEach((item, index) => {
-            if (item.type === 'file' && item.value instanceof File) {
-                formData.append(`kyc[${index}]${item.key}`, item.value);
-            } else if (item.type === 'text') {
-                formData.append(`kyc[${index}]${item.key}`, item.value.toString());
-            }
-        });
-        
-        setLoading(true);
-        const response = await client.post("/user/kycuser", formData, {
-            headers: {
-                Authorization: `Bearer ${JSON.parse(token)}`,
-                'Content-Type': 'multipart/form-data'
-            }
-        });
-        
-        console.log(response.data);
-        router("/dashboard");
-        return Promise.resolve("KYC completed successfully");
-    }
-    catch (error: any) {
-        const resError = error.response?.data;
-        const errorMessage = resError?.message || resError?.data;
-        console.log(errorMessage);
-        return Promise.reject(errorMessage || "Failed to submit KYC");
-    }
-    finally {
-        setLoading(false);
-    }
-}
-
+        catch (error: any) {
+            const resError = error.response?.data;
+            const errorMessage = resError?.message || resError?.data;
+            console.error("KYC submission error:", errorMessage, error);
+            return Promise.reject(errorMessage || "Failed to submit KYC");
+        }
+        finally {
+            setLoading(false);
+        }
+    };
 
 
     const CreateGroup = async (data: createGroupValues) => {
@@ -508,6 +509,250 @@ const SubmitKyc = async (data: KycData) => {
     }
 
 
+    const getStrategyItem = async () => {
+        try {
+            const token = localStorage.getItem("token");
+            if (!token) {
+                router("/auth/signup");
+                return Promise.reject("Authentication required to access strategy items");
+            }
+            
+            setLoading(true);
+            const res = await client.get('/user/getStrategyItem', {
+                headers: {
+                    Authorization: `Bearer ${JSON.parse(token)}`
+                }
+            });
+            return res?.data?.data;
+        } catch (error: any) {
+            const resError = error.response?.data;
+            const errorMessage = resError?.message || resError?.data || "An error occurred";
+            console.error(errorMessage);
+            return Promise.reject(errorMessage);
+        }
+        finally {
+            setLoading(false);
+        }
+    }
+
+    const createStrategies = async (data: createStrategyValues) => {
+        try {
+            const token = localStorage.getItem("token");
+            if (!token) {
+                router("/auth/signup");
+                return Promise.reject("Authentication required to create strategy");
+            }
+            
+            setLoading(true);
+            const res = await client.post('/user/strategiesCreate', data, {
+                headers: {
+                    Authorization: `Bearer ${JSON.parse(token)}`
+                }
+            });
+            console.log(res.data);
+            router('/strategies');
+            return Promise.resolve("Strategy created successfully");
+        } catch (error: any) {
+            const resError = error.response?.data;
+            const errorMessage = resError?.message || resError?.data || "An error occurred";
+            console.error(errorMessage);
+            return Promise.reject(`${errorMessage}`);
+        }
+        finally {
+            setLoading(false);
+        }
+    }
+
+    const updateStrategies = async (data: createStrategyValues) => {
+        try {
+            const token = localStorage.getItem("token");
+            if (!token) {
+                router("/auth/signup");
+                return Promise.reject("Authentication required to update strategy");
+            }
+            
+            setLoading(true);
+            const res = await client.post('/user/strategiesUpdate', data, {
+                headers: {
+                    Authorization: `Bearer ${JSON.parse(token)}`
+                }
+            });
+            console.log(res.data);
+            router('/strategies');
+            return Promise.resolve("Strategy updated successfully");
+        } catch (error: any) {
+            const resError = error.response?.data;
+            const errorMessage = resError?.message || resError?.data || "An error occurred";
+            console.error(errorMessage);
+            return Promise.reject(`${errorMessage}`);
+        }
+        finally {
+            setLoading(false);
+        }
+    }
+
+    const getMyStrategies = async (type: string) => {
+        try {
+            const token = localStorage.getItem("token");
+            if (!token) {
+                router("/auth/signup");
+                return Promise.reject("Authentication required to access strategies");
+            }
+            
+            setLoading(true);
+            const res = await client.get(`/user/getMyStrategy/${type}`, {
+                headers: {
+                    Authorization: `Bearer ${JSON.parse(token)}`
+                }
+            });
+            return res?.data?.data;
+        } catch (error: any) {
+            const resError = error.response?.data;
+            const errorMessage = resError?.message || resError?.data || "An error occurred";
+            console.error(errorMessage);
+            return Promise.reject(`${errorMessage}`);
+        }
+        finally {
+            setLoading(false);
+        }
+    }
+
+    const deleteStrategies = async (id: string) => {
+        try {
+            const token = localStorage.getItem("token");
+            if (!token) {
+                router("/auth/signup");
+                return Promise.reject("Authentication required to delete strategy");
+            }
+            
+            setLoading(true);
+            await client.get(`/user/deleteMyStrategy/${id}`, {
+                headers: {
+                    Authorization: `Bearer ${JSON.parse(token)}`
+                }
+            });
+            return Promise.resolve("Strategy deleted successfully");
+        }
+        catch (error: any) {
+            const resError = error.response?.data;
+            const errorMessage = resError?.message || resError?.data || "An error occurred";
+            console.error(errorMessage);
+            return Promise.reject(`${errorMessage}`);
+        }
+        finally {
+            setLoading(false);
+        }
+    }
+
+
+    const getFinanceItem = async () => {
+        try {
+            const token = localStorage.getItem("token");
+            if (!token) {
+                router("/auth/signup");
+                return Promise.reject("Authentication required to access finance items");
+            }
+            
+            setLoading(true);
+            const res = await client.get('/user/financialItem', {
+                headers: {
+                    Authorization: `Bearer ${JSON.parse(token)}`
+                }
+            });
+            return res?.data?.data;
+        } catch (error: any) {
+            const resError = error.response?.data;
+            const errorMessage = resError?.message || resError?.data || "An error occurred";
+            console.error(errorMessage);
+            return Promise.reject(errorMessage);
+        }
+        finally {
+            setLoading(false);
+        }
+    }
+
+ // Update the FollowFinanceItem function
+const FollowFinanceItem = async (data: { item: string }) => {
+    try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+            router("/auth/signup");
+            return Promise.reject("Authentication required to follow finance item");
+        }
+        
+        setLoading(true);
+        const res = await client.post('/user/submitSelection', data, {
+            headers: {
+                Authorization: `Bearer ${JSON.parse(token)}`
+            }
+        });
+        console.log(res.data);
+        return Promise.resolve("Finance item followed successfully");
+    }   
+    catch (error: any) {
+        const resError = error.response?.data;
+        const errorMessage = resError?.message || resError?.data || "An error occurred";
+        console.error(errorMessage);
+        return Promise.reject(`${errorMessage}`);
+    }
+    finally {
+        setLoading(false);
+    }
+}
+    const getItemFollowing = async () => {
+        try {
+            const token = localStorage.getItem("token");
+            if (!token) {
+                router("/auth/signup");
+                return Promise.reject("Authentication required to access followed items");
+            }
+            
+            setLoading(true);
+            const res = await client.get('/user/getItemFollowing', {
+                headers: {
+                    Authorization: `Bearer ${JSON.parse(token)}`
+                }
+            });
+            return res?.data?.data;
+        } catch (error: any) {
+            const resError = error.response?.data;
+            const errorMessage = resError?.message || resError?.data || "An error occurred";
+            console.error(errorMessage);
+            return Promise.reject(errorMessage);
+        }
+        finally {
+            setLoading(false);
+        }
+    }
+   
+    const unfollowFinanceItem = async (itemId: string) => {
+        try {
+            const token = localStorage.getItem("token");
+            if (!token) {
+                router("/auth/signup");
+                return Promise.reject("Authentication required to unfollow finance item");
+            }
+            
+            setLoading(true);
+            const res = await client.get(`/user/unfollowingItem/${itemId}`, {
+                headers: {
+                    Authorization: `Bearer ${JSON.parse(token)}`
+                }
+            });
+            console.log(res.data);
+            return Promise.resolve("Finance item unfollowed successfully");
+        } catch (error: any) {
+            const resError = error.response?.data;
+            const errorMessage = resError?.message || resError?.data || "An error occurred";
+            console.error(errorMessage);
+            return Promise.reject(errorMessage);
+        }
+        finally {
+            setLoading(false);
+        }
+    }
+    
+
     return {
         loading,
         SubmitSurveyQuestion,
@@ -531,6 +776,15 @@ const SubmitKyc = async (data: KycData) => {
         RemoveUserFromGroup,
         deleteMessage,
         username,
+        getStrategyItem,
+        createStrategies,
+        updateStrategies,
+        getMyStrategies,
+        deleteStrategies,
+        getFinanceItem,
+        FollowFinanceItem,
+        getItemFollowing,
+        unfollowFinanceItem
 
     }
 

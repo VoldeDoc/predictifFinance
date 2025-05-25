@@ -2,7 +2,6 @@ import { Dispatch, Fragment, SetStateAction } from "react";
 import {
   CheckIcon,
   ChevronDownIcon,
-  CogIcon,
   CreditCardIcon,
   XMarkIcon,
 } from "@heroicons/react/24/solid";
@@ -17,7 +16,8 @@ import {
 } from "react-icons/tb";
 import { useSelector } from "react-redux";
 import { RootState } from "@/context/store/rootReducer";
-import { CgPassword } from "react-icons/cg";
+import { CgPassword, CgProfile } from "react-icons/cg";
+import { PiStrategy } from "react-icons/pi";
 
 type Props = {
   showNav: boolean;
@@ -168,6 +168,19 @@ export const Header = ({ showNav, setShowNav }: Props) => {
                   </Menu.Item>
                   <Menu.Item>
                     <Link
+                      to={"/strategies"}
+                      className={
+                        "flex items-center gap-2 rounded p-2 transition-colors ease-in-out duration-150 text-gray-700 hover:bg-gray-100 group"
+                      }
+                    >
+                      <PiStrategy className={"h-4 w-4 text-gray-700"} />
+                      <span className={"group-hover:text-orange-500"}>
+                        Strategies
+                      </span>
+                    </Link>
+                  </Menu.Item>
+                  <Menu.Item>
+                    <Link
                       to={"/auth/change-pwd"}
                       className={
                         "flex items-center gap-2 rounded p-2 transition-colors ease-in-out duration-150 text-gray-700 hover:bg-gray-100 group"
@@ -181,14 +194,14 @@ export const Header = ({ showNav, setShowNav }: Props) => {
                   </Menu.Item>
                   <Menu.Item>
                     <Link
-                      to={"/settings"}
+                      to={"/profile"}
                       className={
                         "flex items-center gap-2 rounded p-2 transition-colors ease-in-out duration-150 text-gray-700 hover:bg-gray-100 group"
                       }
                     >
-                      <CogIcon className={"h-4 w-4 text-gray-700"} />
+                      <CgProfile className={"h-4 w-4 text-gray-700"} />
                       <span className={"group-hover:text-orange-500"}>
-                        Settings
+                        Profile
                       </span>
                     </Link>
                   </Menu.Item>

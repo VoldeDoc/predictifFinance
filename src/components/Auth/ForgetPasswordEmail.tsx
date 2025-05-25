@@ -42,7 +42,7 @@ const ForgetPasswordEmail = () => {
           render({ data }) {
             return <div>{data as string}</div>;
           }
-        },
+        }, // Remove the 'p' character that was here
         error: {
           render({ data }) {
             return <div>{data as string}</div>;
