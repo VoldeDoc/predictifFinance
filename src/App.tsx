@@ -14,7 +14,7 @@ import Investment from "@/pages/investing";
 import Dashboard_T from "@/pages/dashboard";
 import Stocking from "@/pages/stock";
 import Market from "@/pages/marketzone";
-import Dashboard2Page from "./pages/dashboard2";
+// import Dashboard2Page from "./pages/dashboard2";
 import PredictiveAccountPage from "./pages/predictive_account/predictiveAccountPage";
 import SavingsPage from "./pages/Savings";
 import EducationPage from "./pages/education";
@@ -93,7 +93,7 @@ function App() {
               <Route path="/dashboard" element={<ProtectedRoute><Dashboard_T /></ProtectedRoute>} />
               <Route path="/stock" element={<ProtectedRoute><Stocking /></ProtectedRoute>} />
               <Route path="/market-zone" element={<ProtectedRoute><Market /></ProtectedRoute>} />
-              <Route path="/dashboard2" element={<ProtectedRoute><Dashboard2Page /></ProtectedRoute>} />
+              {/* <Route path="/dashboard2" element={<ProtectedRoute><Dashboard2Page /></ProtectedRoute>} /> */}
               <Route path="/predictive-account" element={<ProtectedRoute><PredictiveAccountPage /></ProtectedRoute>} />
               <Route path="/savings" element={<ProtectedRoute><SavingsPage /></ProtectedRoute>} />
               <Route path="/education" element={<ProtectedRoute><EducationPage /></ProtectedRoute>} />

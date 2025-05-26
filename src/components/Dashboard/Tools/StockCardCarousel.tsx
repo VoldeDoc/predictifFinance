@@ -9,6 +9,7 @@ import { StockAreaChart } from "@/components/Chart/StockAreaChart";
 import UseFinanceHook from "@/hooks/UseFinance";
 import Modal from "./Modal";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 export function generateRandomData(length: number, digits?: number): number[] {
   if (!digits) digits = 3;
@@ -51,7 +52,7 @@ const StockCardCarousel = () => {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
 
   const { getFinanceItem, FollowFinanceItem, getItemFollowing } = UseFinanceHook();
-
+  const navigate = useNavigate();
   useEffect(() => {
     fetchFollowedItems();
   }, []);
@@ -61,7 +62,7 @@ const StockCardCarousel = () => {
     try {
       const response = await getItemFollowing();
       console.log("Followed items response:", response);
-      
+
       // Handle different response formats
       if (response && Array.isArray(response)) {
         if (response.length > 0 && Array.isArray(response[0])) {
@@ -90,9 +91,9 @@ const StockCardCarousel = () => {
     try {
       const response = await getFinanceItem();
       console.log("Available items response:", response);
-      
+
       let items: FinanceItem[] = [];
-      
+
       // Handle different response formats
       if (response) {
         if (Array.isArray(response)) {
@@ -116,39 +117,39 @@ const StockCardCarousel = () => {
           }
         }
       }
-      
+
       // Get IDs of items that are already followed - convert all to lowercase strings for comparison
       const alreadyFollowedIds = followedItems.map(item => {
         const id = item.fitem_id || String(item.id);
         return String(id).toLowerCase();
       });
-      
+
       console.log("Already followed IDs:", alreadyFollowedIds);
-      
+
       // Mark items that are already followed with more robust comparison
       const itemsWithSelection = items.map((item: FinanceItem) => {
         // Convert both IDs to lowercase strings for more reliable comparison
         const itemId = String(item.id).toLowerCase();
         const itemIdEn = item.idEn ? String(item.idEn).toLowerCase() : null;
-        
+
         // Check if this item is already being followed
         const isAlreadyFollowed = !!(
-          alreadyFollowedIds.includes(itemId) || 
+          alreadyFollowedIds.includes(itemId) ||
           (itemIdEn && alreadyFollowedIds.includes(itemIdEn))
         );
-        
+
         console.log(`Item ${item.name} (${item.id}): Already followed = ${isAlreadyFollowed}`);
-        
+
         return {
           ...item,
           isSelected: false, // Don't preselect anything
           isAlreadyFollowed // New flag to track if already followed
         };
       });
-      
+
       // Set the available items state
       setAvailableItems(itemsWithSelection);
-      
+
       // Clear selected items - we don't want to preselect already followed items
       setSelectedItems([]);
     } catch (error) {
@@ -187,7 +188,7 @@ const StockCardCarousel = () => {
       const itemsToFollow = {
         item: selectedItems.join(',') // Convert array to comma-separated string
       };
-      
+
       await toast.promise(
         FollowFinanceItem(itemsToFollow),
         {
@@ -219,13 +220,21 @@ const StockCardCarousel = () => {
     <>
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold text-gray-800">My Stocks</h1>
-        <button
-          onClick={handleOpenModal}
-          className="bg-[#6425fe] text-white px-4 py-2 rounded-lg flex items-center gap-2"
-        >
-          <FaPlus size={14} />
-          <span>Follow Stocks</span>
-        </button>
+        <div className="flex space-x-3">
+          <button
+            onClick={() => navigate("/strategies/create")}
+            className="bg-[#6425fe] text-white px-4 py-2 rounded-lg flex items-center gap-2"
+          >
+            <FaPlus size={14} />
+            <span>Create Strategy</span>
+          </button>
+          <button
+            onClick={handleOpenModal}
+            className="bg-[#6425fe] text-white px-4 py-2 rounded-lg flex items-center gap-2"
+          >
+            <FaPlus size={14} />
+            <span>Follow Stocks</span>
+          </button></div>
       </div>
 
       <div className="w-full bg-white p-7 rounded-lg mt-7 relative">
@@ -372,9 +381,8 @@ const StockCardCarousel = () => {
                 availableItems.map((item) => (
                   <div
                     key={item.id}
-                    className={`flex items-center border-b border-gray-100 py-3 ${
-                      item.isAlreadyFollowed ? 'bg-gray-50 opacity-75 pointer-events-none' : ''
-                    }`}
+                    className={`flex items-center border-b border-gray-100 py-3 ${item.isAlreadyFollowed ? 'bg-gray-50 opacity-75 pointer-events-none' : ''
+                      }`}
                     onClick={(e) => {
                       if (item.isAlreadyFollowed) {
                         e.preventDefault();
@@ -397,9 +405,8 @@ const StockCardCarousel = () => {
                     )}
                     <label
                       htmlFor={item.isAlreadyFollowed ? undefined : `item-${item.id}`}
-                      className={`flex items-center ml-3 ${
-                        item.isAlreadyFollowed ? 'cursor-not-allowed text-gray-500' : 'cursor-pointer'
-                      } w-full`}
+                      className={`flex items-center ml-3 ${item.isAlreadyFollowed ? 'cursor-not-allowed text-gray-500' : 'cursor-pointer'
+                        } w-full`}
                     >
                       <img
                         src={item.logo || "assets/images/stocks/default.png"}
