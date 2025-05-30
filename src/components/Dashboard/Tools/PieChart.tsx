@@ -48,7 +48,7 @@ export default function PieChart(_: PieChartProps) {
   const [formAmount, setFormAmount] = useState('');
   const [formDate, setFormDate] = useState('');
   const [saveloading, setSaveloading] = useState(false);
-  const [categoriesList, setCategoriesList] = useState<string[]>([]);
+  // const [categoriesList, setCategoriesList] = useState<string[]>([]);
 
   useEffect(() => {
     // load categories & periods
@@ -135,7 +135,7 @@ export default function PieChart(_: PieChartProps) {
     const cats = activeTab === 'expense'
       ? ['feeding', 'rent', 'entertainment', 'education', 'other']
       : ['salary', 'investment', 'allowance', 'gift', 'other'];
-    setCategoriesList(cats);
+    // setCategoriesList(cats);
     setFormCategory(cats[0]);
 
   };
