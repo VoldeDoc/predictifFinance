@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import UseFinanceHook from '@/hooks/UseFinance';
 import { ChevronDownIcon } from '@heroicons/react/24/outline';
 
 // Define expense category type
@@ -16,86 +17,174 @@ interface CategoryWithAngles extends Category {
 }
 
 interface PieChartProps {
-  expenseData?: Category[];
-  incomeData?: Category[];
+  // expenseData?: Category[];
+  // incomeData?: Category[];
 }
 
-export default function PieChart({ expenseData, incomeData }: PieChartProps) {
-  const [activeTab, setActiveTab] = useState<'expense' | 'income'>('expense');
-  const [selectedMonth, setSelectedMonth] = useState('March');
-  
-  // Default expense data if none provided
-  const defaultExpenseData: Category[] = [
-    { name: 'Rent & Living', amount: 2100, color: '#ECF4E9', percentage: 60 },
-    { name: 'Investment', amount: 525, color: '#E5E6E6', percentage: 15 },
-    { name: 'Education', amount: 420, color: '#002072', percentage: 12 },
-    { name: 'Food & Drink', amount: 280, color: '#BCBEBD', percentage: 8 },
-    { name: 'Entertainment', amount: 175, color: '#4FB7EF', percentage: 5 }
-  ];
+const MONTHS = [
+  "January","February","March","April","May","June",
+  "July","August","September","October","November","December"
+];
 
-  // Default income data
-  const defaultIncomeData: Category[] = [
-    { name: 'Salary', amount: 3500, color: '#ECF4E9', percentage: 70 },
-    { name: 'Freelance', amount: 750, color: '#002072', percentage: 15 },
-    { name: 'Investments', amount: 500, color: '#4FB7EF', percentage: 10 },
-    { name: 'Other', amount: 250, color: '#BCBEBD', percentage: 5 }
-  ];
+export default function PieChart(_: PieChartProps) {
+  const {
+    getExpenseCategories,
+    getIncomeCategories,
+    getBudgetPeriods,
+    createBudgetItem,
+  } = UseFinanceHook();
 
-  // Use provided data or fallback to defaults
-  const expenses = expenseData || defaultExpenseData;
-  const incomes = incomeData || defaultIncomeData;
-  
-  // Get current data based on active tab
-  const currentData = activeTab === 'expense' ? expenses : incomes;
-  const totalAmount = currentData.reduce((sum, item) => sum + item.amount, 0);
+  const [periods, setPeriods] = useState<
+    { id: string; label: string; startDate: string; endDate: string }[]
+  >([]);
+  const [selectedMonth, setSelectedMonth] = useState("June");
+  const [activeTab, setActiveTab] = useState<"expense" | "income">("expense");
+  const [expenseData, setExpenseData] = useState<Category[]>([]);
+  const [incomeData, setIncomeData] = useState<Category[]>([]);
 
-  // Calculate angles for each segment
-  const dataWithAngles: CategoryWithAngles[] = currentData.map((item, idx) => {
-    const previousEndAngle = currentData
+  const [showModal, setShowModal] = useState(false);
+  const [formCategory, setFormCategory] = useState('');
+  const [formItem, setFormItem] = useState('');
+  const [formAmount, setFormAmount] = useState('');
+  const [formDate, setFormDate] = useState('');
+  const [saveloading, setSaveloading] = useState(false);
+  const [categoriesList, setCategoriesList] = useState<string[]>([]);
+
+  useEffect(() => {
+    // load categories & periods
+    (async () => {
+      const [rawExp, rawInc, rawPeriods] = await Promise.all([
+        getExpenseCategories(),
+        getIncomeCategories(),
+        getBudgetPeriods(),
+      ]);
+      setPeriods(
+        rawPeriods.map((p) => ({
+          id: p.id,
+          label: p.label,
+          startDate: p.startDate!,
+          endDate: p.endDate!,
+        }))
+      );
+      buildChart(rawExp, setExpenseData);
+      buildChart(rawInc, setIncomeData);
+    })();
+  }, []);
+
+  function buildChart(
+    raw: { category: string; total_amount: number }[],
+    set: React.Dispatch<React.SetStateAction<Category[]>>
+  ) {
+    const total = raw.reduce((sum, x) => sum + x.total_amount, 0);
+    const colors = activeTab === "expense"
+      ? ["#ECF4E9", "#E5E6E6", "#002072", "#BCBEBD", "#4FB7EF"]
+      : ["#ECF4E9", "#002072", "#4FB7EF", "#BCBEBD"];
+
+    set(
+      raw.map((x, i) => ({
+        name: x.category,
+        amount: x.total_amount,
+        color: colors[i % colors.length],
+        percentage: total ? Math.round((x.total_amount / total) * 100) : 0,
+      }))
+    );
+  }
+
+  const data = activeTab === "expense" ? expenseData : incomeData;
+  const totalAmount = data.reduce((sum, d) => sum + d.amount, 0);
+
+  // pick current
+  const currentPlan = periods.find((p) =>
+    p.label.toLowerCase().includes(selectedMonth.toLowerCase())
+  );
+  const planId = currentPlan?.id;
+  // const totalAmount = currentData.reduce((sum, d) => sum + d.amount, 0);
+
+  // angles
+  const dataWithAngles: CategoryWithAngles[] = data.map((item, idx) => {
+    const prevAngle = data
       .slice(0, idx)
-      .reduce((sum, e) => sum + (e.percentage * 3.6), 0);
-    
+      .reduce((sum, e) => sum + e.percentage * 3.6, 0);
     return {
       ...item,
-      startAngle: previousEndAngle,
-      endAngle: previousEndAngle + (item.percentage * 3.6) // Convert to degrees (percentage * 360/100)
+      startAngle: prevAngle,
+      endAngle: prevAngle + item.percentage * 3.6,
     };
   });
 
-  // Generate SVG path for each segment with spacing
-  const generatePieSegment = (startAngle: number, endAngle: number, radius: number, innerRadius: number) => {
-    // Add spacing between segments (2 degrees)
-    const spacingAngle = 2;
-    const adjustedStartAngle = startAngle + spacingAngle / 2;
-    const adjustedEndAngle = endAngle - spacingAngle / 2;
-    
-    // Convert angles from degrees to radians
-    const startRad = (adjustedStartAngle - 90) * Math.PI / 180;
-    const endRad = (adjustedEndAngle - 90) * Math.PI / 180;
-    
-    const x1 = radius * Math.cos(startRad);
-    const y1 = radius * Math.sin(startRad);
-    const x2 = radius * Math.cos(endRad);
-    const y2 = radius * Math.sin(endRad);
-    
-    // Inner circle coordinates
-    const x3 = innerRadius * Math.cos(endRad);
-    const y3 = innerRadius * Math.sin(endRad);
-    const x4 = innerRadius * Math.cos(startRad);
-    const y4 = innerRadius * Math.sin(startRad);
-    
-    // Determine if the arc should be drawn as a large arc (> 180 degrees)
-    const largeArcFlag = adjustedEndAngle - adjustedStartAngle > 180 ? 1 : 0;
-    
-    // Create the SVG path for a donut segment
-    return `M ${x1} ${y1} A ${radius} ${radius} 0 ${largeArcFlag} 1 ${x2} ${y2} L ${x3} ${y3} A ${innerRadius} ${innerRadius} 0 ${largeArcFlag} 0 ${x4} ${y4} Z`;
+  const generatePieSegment = (start: number, end: number, r: number, ir: number) => {
+    const spacing = 2;
+    const a1 = (start + spacing / 2 - 90) * Math.PI / 180;
+    const a2 = (end - spacing / 2 - 90) * Math.PI / 180;
+    const x1 = r * Math.cos(a1), y1 = r * Math.sin(a1);
+    const x2 = r * Math.cos(a2), y2 = r * Math.sin(a2);
+    const x3 = ir * Math.cos(a2), y3 = ir * Math.sin(a2);
+    const x4 = ir * Math.cos(a1), y4 = ir * Math.sin(a1);
+    const large = end - start > 180 ? 1 : 0;
+    return `M ${x1} ${y1} A ${r} ${r} 0 ${large} 1 ${x2} ${y2} L ${x3} ${y3} A ${ir} ${ir} 0 ${large} 0 ${x4} ${y4} Z`;
   };
 
-  // Available months for filter
-  const months = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
-  ];
+  // const months = [
+  //   'January', 'February', 'March', 'April', 'May', 'June',
+  //   'July', 'August', 'September', 'October', 'November', 'December'
+  // ];
+
+  const openForm = async () => {
+    setShowModal(true);
+
+    const cats = activeTab === 'expense'
+      ? ['feeding', 'rent', 'entertainment', 'education', 'other']
+      : ['salary', 'investment', 'allowance', 'gift', 'other'];
+    setCategoriesList(cats);
+    setFormCategory(cats[0]);
+
+  };
+
+  // const submitForm = async () => {
+  //   const payload = {
+  //     category: formCategory,
+  //     item: formItem,
+  //     amount: formAmount,
+  //     date: formDate,
+  //   };
+  //   try {
+  //     if (activeTab === 'expense') {
+  //       await addExpense(payload);
+  //     } else {
+  //       await addIncome(payload);
+  //     }
+  //     setShowModal(false);
+  //     // reload chart data
+  //     // you can simply re-run the useEffect by toggling activeTab
+  //     setActiveTab(activeTab === 'expense' ? 'income' : 'expense');
+  //     setActiveTab(activeTab);
+  //   } catch (err) {
+  //     console.error(err);
+  //   }
+  // };
+
+  const handleSave = async () => {
+    if (!planId) {
+      return alert("No budget period found for " + selectedMonth);
+    }
+    setSaveloading(true);
+    await createBudgetItem({
+      plan_id: planId,
+      category: formCategory,
+      item: formItem,
+      amount: formAmount,
+      date: formDate,
+      source: activeTab,
+    });
+    setShowModal(false);
+    setSaveloading(false);
+
+    // re-fetch categories for just that source
+    const fresh = activeTab === "expense"
+      ? await getExpenseCategories()
+      : await getIncomeCategories();
+    buildChart(fresh, activeTab === "expense" ? setExpenseData : setIncomeData);
+  };
 
   return (
     <div className="bg-white p-4 rounded-lg shadow-sm mt-6">
@@ -103,46 +192,46 @@ export default function PieChart({ expenseData, incomeData }: PieChartProps) {
       <div className="flex flex-col mb-4">
         <div className="flex justify-between items-center mb-3">
           <h2 className="text-lg font-semibold">Statistics</h2>
-          
+
           <div className="relative">
             <select
+              className="bg-gray-50 border px-2 py-1 rounded"
               value={selectedMonth}
               onChange={(e) => setSelectedMonth(e.target.value)}
-              className="appearance-none bg-gray-50 px-3 py-1 pr-8 rounded-md text-sm border border-gray-300"
             >
-              {months.map(month => (
-                <option key={month} value={month}>{month}</option>
+              {MONTHS.map((m) => (
+                <option key={m} value={m}>
+                  {m}
+                </option>
               ))}
             </select>
             <ChevronDownIcon className="absolute right-2 top-2 h-4 w-4 text-gray-500" />
           </div>
         </div>
-        
+
         {/* Tabs */}
         <div className="flex border-b border-gray-200">
           <button
-            className={`py-2 px-4 font-medium text-sm ${
-              activeTab === 'expense'
-                ? 'border-b-2 border-blue-500 text-blue-600'
-                : 'text-gray-500'
-            }`}
+            className={`py-2 px-4 font-medium text-sm ${activeTab === 'expense'
+              ? 'border-b-2 border-blue-500 text-blue-600'
+              : 'text-gray-500'
+              }`}
             onClick={() => setActiveTab('expense')}
           >
             Expense
           </button>
           <button
-            className={`py-2 px-4 font-medium text-sm ${
-              activeTab === 'income'
-                ? 'border-b-2 border-blue-500 text-blue-600'
-                : 'text-gray-500'
-            }`}
+            className={`py-2 px-4 font-medium text-sm ${activeTab === 'income'
+              ? 'border-b-2 border-blue-500 text-blue-600'
+              : 'text-gray-500'
+              }`}
             onClick={() => setActiveTab('income')}
           >
             Income
           </button>
         </div>
       </div>
-      
+
       <div className="flex flex-col items-center">
         {/* Pie chart */}
         <div className="relative w-56 h-56 mb-8">
@@ -151,45 +240,111 @@ export default function PieChart({ expenseData, incomeData }: PieChartProps) {
             <p className="text-sm text-gray-500">Total {activeTab === 'expense' ? 'Expense' : 'Income'}</p>
             <p className="font-bold text-lg">${totalAmount.toLocaleString()}</p>
           </div>
-          
+
           {/* SVG for pie chart with increased spacing between segments */}
           <svg viewBox="-100 -100 200 200" className="w-full h-full">
-            {dataWithAngles.map((item) => (
+            {dataWithAngles.map(d => (
               <path
-                key={item.name}
-                d={generatePieSegment(item.startAngle, item.endAngle, 90, 40)}
-                fill={item.color}
+                key={d.name}
+                d={generatePieSegment(d.startAngle, d.endAngle, 90, 40)}
+                fill={d.color}
                 stroke="#fff"
                 strokeWidth="2"
               />
             ))}
           </svg>
         </div>
-        
+
         {/* Legend */}
         <div className="w-full space-y-4">
-          {dataWithAngles.map((item) => (
-            <div key={item.name} className="flex items-center justify-between">
+          {dataWithAngles.map(d => (
+            <div key={d.name} className="flex items-center justify-between">
               <div className="flex items-center">
-                <div className="relative mr-3">
-                  <div 
-                    className="w-8 h-8 rounded-md flex items-center justify-center text-xs font-medium text-gray-700"
-                    style={{ backgroundColor: item.color }}
-                  >
-                    {item.percentage}%
-                  </div>
+                <div
+                  className="w-8 h-8 rounded-md flex items-center justify-center text-xs font-medium mr-3"
+                  style={{ backgroundColor: d.color }}
+                >
+                  {d.percentage}%
                 </div>
-                <span className="text-sm font-medium">{item.name}</span>
+                <span className="text-sm font-medium capitalize">{d.name}</span>
               </div>
-              <div className="text-right">
-                <span className="text-sm font-semibold">
-                  ${item.amount.toLocaleString()}
-                </span>
-              </div>
+              <span className="text-sm font-semibold">
+                ${d.amount.toLocaleString()}
+              </span>
             </div>
           ))}
+          <button
+            onClick={openForm}
+            className="px-3 py-1 bg-indigo-600 text-white rounded"
+          >
+            Add {activeTab === 'expense' ? 'Expense' : 'Income'}
+          </button>
         </div>
       </div>
+      {/* modal */}
+      {showModal && (
+        <div className="fixed z-[100] inset-0 bg-[rgb(0,0,0,0.3)] bg-opacity-30 flex items-center justify-center">
+          <div className="bg-white p-6 rounded shadow-lg w-80">
+            <h3 className="font-semibold mb-4">
+              Add {activeTab === 'expense' ? 'Expense' : 'Income'}
+            </h3>
+
+            <label className="block mb-2 text-sm">Category</label>
+            <select
+              className="w-full mb-4 p-2 border rounded capitalize"
+              value={formCategory}
+              onChange={(e) => setFormCategory(e.target.value)}
+            >
+              {(activeTab === "expense"
+                ? ["feeding", "rent", "entertainment", "education", "other"]
+                : ["salary", "investment", "allowance", "gift", "other"]
+              ).map((c) => (
+                <option className="!capitalize" key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+            </select>
+
+            <label className="block mb-2 text-sm">Item</label>
+            <input
+              value={formItem}
+              onChange={e => setFormItem(e.target.value)}
+              className="w-full mb-4 p-2 border rounded"
+            />
+
+            <label className="block mb-2 text-sm">Amount</label>
+            <input
+              type="number"
+              value={formAmount}
+              onChange={e => setFormAmount(e.target.value)}
+              className="w-full mb-4 p-2 border rounded"
+            />
+
+            <label className="block mb-2 text-sm">Date</label>
+            <input
+              type="date"
+              value={formDate}
+              onChange={e => setFormDate(e.target.value)}
+              className="w-full mb-4 p-2 border rounded"
+            />
+
+            <div className="flex justify-end space-x-2">
+              <button
+                onClick={() => setShowModal(false)}
+                className="px-3 py-1 border rounded"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSave}
+                className="px-3 py-1 bg-blue-600 text-white rounded"
+              >
+                {saveloading ? 'Saving...' : 'Save'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

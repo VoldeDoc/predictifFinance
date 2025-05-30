@@ -1,18 +1,19 @@
 import axiosClient from "@/services/axios-client";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { addMembersValues, AssignMemberRoleValues, createGroupValues, createStrategyValues, deleteMessageValues, editMessageValues, KycData, sendMessageValues, SurveyDataValues ,  } from "@/types";
+import { addMembersValues, AssignMemberRoleValues, createGroupValues, createStrategyValues, deleteMessageValues, editMessageValues, KycData, sendMessageValues, SurveyDataValues, } from "@/types";
 import { toast } from "react-toastify";
 import { RootState } from "@/context/store/rootReducer";
 import { useSelector } from "react-redux";
+import axios from "axios";
 
 const UseFinanceHook = () => {
     const client = axiosClient();
     const [loading, setLoading] = useState(false);
     const router = useNavigate();
-        const userdata = useSelector((state: RootState) => state.auth?.user);
+    const userdata = useSelector((state: RootState) => state.auth?.user);
 
-        const username = userdata?.username;
+    const username = userdata?.username;
 
     const SubmitSurveyQuestion = async (data: SurveyDataValues) => {
         try {
@@ -43,7 +44,7 @@ const UseFinanceHook = () => {
     }
 
     const getUserDetails = async () => {
-        try { 
+        try {
             const token = localStorage.getItem("token");
             if (!token) {
                 router("/auth/signup");
@@ -68,17 +69,17 @@ const UseFinanceHook = () => {
         }
     }
 
-  const SubmitKyc = async (data: KycData) => {
+    const SubmitKyc = async (data: KycData) => {
         try {
             const token = localStorage.getItem("token");
             if (!token) {
                 router("/auth/signup");
                 return Promise.reject("Authentication required for KYC submission");
             }
-            
+
             // Create FormData to properly handle file upload
             const formData = new FormData();
-            
+
             // Add each KYC item to the formData with the proper array index notation
             data.kyc.forEach((item, index) => {
                 if (item.type === 'file' && item.value instanceof File) {
@@ -89,7 +90,7 @@ const UseFinanceHook = () => {
                     formData.append(`kyc[${index}][type]`, item.type);
                 }
             });
-            
+
             setLoading(true);
             const response = await client.post("/user/kycuser", formData, {
                 headers: {
@@ -97,7 +98,7 @@ const UseFinanceHook = () => {
                     'Content-Type': 'multipart/form-data'
                 }
             });
-            
+
             console.log("KYC submission successful:", response.data);
             router("/dashboard");
             return Promise.resolve("KYC completed successfully");
@@ -121,7 +122,7 @@ const UseFinanceHook = () => {
                 router("/auth/signup");
                 return Promise.reject("Authentication required to create group");
             }
-            
+
             setLoading(true);
             const group = await client.post("/forum/groups", data, {
                 headers: {
@@ -135,7 +136,7 @@ const UseFinanceHook = () => {
         } catch (error: any) {
             const resError = error.response?.data;
             const errorMessage =
-                resError?.message || resError?.data ;
+                resError?.message || resError?.data;
             console.log(errorMessage);
             return Promise.reject(`${errorMessage}`);
         } finally {
@@ -150,7 +151,7 @@ const UseFinanceHook = () => {
                 router("/auth/signup");
                 return Promise.reject("Authentication required to access group");
             }
-            
+
             setLoading(true);
             const group = await client.get(`/forum/groups/${id}`, {
                 headers: {
@@ -181,7 +182,7 @@ const UseFinanceHook = () => {
                 router("/auth/signup");
                 return Promise.reject("Authentication required to access group users");
             }
-            
+
             setLoading(true);
             const users = await client.get(`/forum/groups/${id}/users`, {
                 headers: {
@@ -207,7 +208,7 @@ const UseFinanceHook = () => {
                 router("/auth/signup");
                 return Promise.reject("Authentication required to access groups");
             }
-            
+
             setLoading(true);
             const allgroups = await client.get("/forum/groups", {
                 headers: {
@@ -232,7 +233,7 @@ const UseFinanceHook = () => {
                 router("/auth/signup");
                 return Promise.reject("Authentication required to update group");
             }
-            
+
             setLoading(true);
             const group = await client.put(`/forum/groups/${id}`, data, {
                 headers: {
@@ -299,7 +300,7 @@ const UseFinanceHook = () => {
                 router("/auth/signup");
                 return Promise.reject("Authentication required to send message");
             }
-            
+
             setLoading(true);
             const sentMessage = await client.post('/forum/messages/send', data, {
                 headers: {
@@ -327,9 +328,9 @@ const UseFinanceHook = () => {
                 router("/auth/signup");
                 return Promise.reject("Authentication required to access messages");
             }
-            
+
             setLoading(true);
-            const response = await client.get(`/forum/messages`, { 
+            const response = await client.get(`/forum/messages`, {
                 params: { group_id: group_Id },
                 headers: {
                     Authorization: `Bearer ${JSON.parse(token)}`
@@ -354,7 +355,7 @@ const UseFinanceHook = () => {
                 router("/auth/signup");
                 return Promise.reject("Authentication required to edit message");
             }
-            
+
             setLoading(true);
             const response = await client.post('/forum/messages/edit', data, {
                 headers: {
@@ -516,7 +517,7 @@ const UseFinanceHook = () => {
                 router("/auth/signup");
                 return Promise.reject("Authentication required to access strategy items");
             }
-            
+
             setLoading(true);
             const res = await client.get('/user/getStrategyItem', {
                 headers: {
@@ -542,7 +543,7 @@ const UseFinanceHook = () => {
                 router("/auth/signup");
                 return Promise.reject("Authentication required to create strategy");
             }
-            
+
             setLoading(true);
             const res = await client.post('/user/strategiesCreate', data, {
                 headers: {
@@ -570,7 +571,7 @@ const UseFinanceHook = () => {
                 router("/auth/signup");
                 return Promise.reject("Authentication required to update strategy");
             }
-            
+
             setLoading(true);
             const res = await client.post('/user/strategiesUpdate', data, {
                 headers: {
@@ -598,7 +599,7 @@ const UseFinanceHook = () => {
                 router("/auth/signup");
                 return Promise.reject("Authentication required to access strategies");
             }
-            
+
             setLoading(true);
             const res = await client.get(`/user/getMyStrategy/${type}`, {
                 headers: {
@@ -624,7 +625,7 @@ const UseFinanceHook = () => {
                 router("/auth/signup");
                 return Promise.reject("Authentication required to delete strategy");
             }
-            
+
             setLoading(true);
             await client.get(`/user/deleteMyStrategy/${id}`, {
                 headers: {
@@ -652,7 +653,7 @@ const UseFinanceHook = () => {
                 router("/auth/signup");
                 return Promise.reject("Authentication required to access finance items");
             }
-            
+
             setLoading(true);
             const res = await client.get('/user/financialItem', {
                 headers: {
@@ -671,34 +672,34 @@ const UseFinanceHook = () => {
         }
     }
 
- // Update the FollowFinanceItem function
-const FollowFinanceItem = async (data: { item: string }) => {
-    try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-            router("/auth/signup");
-            return Promise.reject("Authentication required to follow finance item");
-        }
-        
-        setLoading(true);
-        const res = await client.post('/user/submitSelection', data, {
-            headers: {
-                Authorization: `Bearer ${JSON.parse(token)}`
+    // Update the FollowFinanceItem function
+    const FollowFinanceItem = async (data: { item: string }) => {
+        try {
+            const token = localStorage.getItem("token");
+            if (!token) {
+                router("/auth/signup");
+                return Promise.reject("Authentication required to follow finance item");
             }
-        });
-        console.log(res.data);
-        return Promise.resolve("Finance item followed successfully");
-    }   
-    catch (error: any) {
-        const resError = error.response?.data;
-        const errorMessage = resError?.message || resError?.data || "An error occurred";
-        console.error(errorMessage);
-        return Promise.reject(`${errorMessage}`);
+
+            setLoading(true);
+            const res = await client.post('/user/submitSelection', data, {
+                headers: {
+                    Authorization: `Bearer ${JSON.parse(token)}`
+                }
+            });
+            console.log(res.data);
+            return Promise.resolve("Finance item followed successfully");
+        }
+        catch (error: any) {
+            const resError = error.response?.data;
+            const errorMessage = resError?.message || resError?.data || "An error occurred";
+            console.error(errorMessage);
+            return Promise.reject(`${errorMessage}`);
+        }
+        finally {
+            setLoading(false);
+        }
     }
-    finally {
-        setLoading(false);
-    }
-}
     const getItemFollowing = async () => {
         try {
             const token = localStorage.getItem("token");
@@ -706,7 +707,7 @@ const FollowFinanceItem = async (data: { item: string }) => {
                 router("/auth/signup");
                 return Promise.reject("Authentication required to access followed items");
             }
-            
+
             setLoading(true);
             const res = await client.get('/user/getItemFollowing', {
                 headers: {
@@ -724,7 +725,7 @@ const FollowFinanceItem = async (data: { item: string }) => {
             setLoading(false);
         }
     }
-   
+
     const unfollowFinanceItem = async (itemId: string) => {
         try {
             const token = localStorage.getItem("token");
@@ -732,7 +733,7 @@ const FollowFinanceItem = async (data: { item: string }) => {
                 router("/auth/signup");
                 return Promise.reject("Authentication required to unfollow finance item");
             }
-            
+
             setLoading(true);
             const res = await client.get(`/user/unfollowingItem/${itemId}`, {
                 headers: {
@@ -751,7 +752,218 @@ const FollowFinanceItem = async (data: { item: string }) => {
             setLoading(false);
         }
     }
-    
+
+
+    const getChartData = async (
+        symbol: string,
+        resolution: string = "D",
+        from: number,
+        to: number
+    ): Promise<{ x: number; y: number }[]> => {
+        setLoading(true);
+        try {
+            const apiKey = "SLINNRNUBVZ04IKX";
+            const response = await axios.get(
+                `https://www.alphavantage.co/query`, {
+                params: {
+                    function: "TIME_SERIES_DAILY",
+                    symbol,
+                    apikey: apiKey,
+                    outputsize: "compact"
+                }
+            }
+            );
+
+            const timeSeries = response.data["Time Series (Daily)"];
+            if (!timeSeries) return [];
+
+            const result = Object.entries(timeSeries).map(([date, value]: any) => ({
+                x: new Date(date).getTime(),
+                y: parseFloat(value["4. close"])
+            }));
+
+            return result.reverse();
+        }
+        catch (err: any) {
+            console.error("Error fetching chart data for", symbol, err);
+            return [];
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const getBudgetPlans = async () => {
+        try {
+            const token = localStorage.getItem("token");
+            if (!token) throw new Error("Unauthorized");
+            setLoading(true);
+            const response = await client.get('/user/budgetget', {
+                headers: { Authorization: `Bearer ${JSON.parse(token)}` }
+            });
+            // response.data.data is the array of plans
+            return response.data.data;
+        } catch (err: any) {
+            console.error("Error fetching budget plans:", err);
+            return [];
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const createBudgetPlan = async (
+        data: { label: string; budget_amount: string }
+    ): Promise<any> => {
+        try {
+            const token = localStorage.getItem("token");
+            if (!token) throw new Error("Authentication required");
+            setLoading(true);
+            const response = await client.post(
+                "/user/budgetCreate",
+                data,
+                {
+                    headers: { Authorization: `Bearer ${JSON.parse(token)}` }
+                }
+            );
+            return response.data.data;
+        } catch (err: any) {
+            console.error("Error creating budget plan:", err);
+            throw err;
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const updateBudgetPlan = async (data: {
+        id: string;
+        label: string;
+        budget_amount: string;
+        detail?: string;
+        startDate?: string;
+        endDate?: string;
+    }) => {
+        try {
+            const token = localStorage.getItem("token");
+            if (!token) throw new Error("Authentication required");
+            setLoading(true);
+            const res = await client.post('/user/budgetUpdate', data,
+                {
+                    headers: { Authorization: `Bearer ${JSON.parse(token)}` }
+                }
+            );
+            return res.data.data; // true on success
+        } catch (err: any) {
+            console.error('Error updating budget plan', err);
+            return Promise.reject(err);
+        }
+    };
+
+    // DELETE /user/budgetDelete/:id
+    const deleteBudgetPlan = async (id: string) => {
+        try {
+            const token = localStorage.getItem("token");
+            if (!token) throw new Error("Unauthorized");
+            const res = await client.get(`/user/budgetDelete/${id}`,
+                {
+                    headers: { Authorization: `Bearer ${JSON.parse(token)}` }
+                });
+            // res.data.data contains the deleted record
+            return res.data.data;
+        } catch (err: any) {
+            console.error('Error deleting budget plan', err);
+            return Promise.reject(err);
+        }
+    };
+
+    const getBudgetSummary = async (): Promise<{
+        budgetamount: number;
+        income: number;
+        expense: number;
+    }> => {
+        try {
+            const token = localStorage.getItem("token");
+            if (!token) throw new Error("Unauthorized");
+            setLoading(true);
+            const res = await client.get("/user/budgetsummary",
+                {
+                    headers: { Authorization: `Bearer ${JSON.parse(token)}` }
+                }
+            );
+            // API shape: { status, message, data: { budgetamount, income, expense } }
+            return res.data.data;
+        } catch (err: any) {
+            console.error("Error fetching budget summary", err);
+            return Promise.reject(err);
+        }
+    };
+
+    const getExpenseCategories = async (): Promise<{ category: string; total_amount: number }[]> => {
+        try {
+            const token = localStorage.getItem("token");
+            if (!token) throw new Error("Unauthorized");
+            setLoading(true);
+            const res = await client.get("/user/budgetsummaryExpense", {
+                headers: { Authorization: `Bearer ${JSON.parse(token)}` },
+            });
+            // API: { status, message, data: [ { category, total_amount } ] }
+            return res.data.data;
+        } catch (err: any) {
+            console.error("Error fetching expense categories", err);
+            return Promise.reject(err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+
+    const getIncomeCategories = async (): Promise<{ category: string; total_amount: number }[]> => {
+        try {
+            const token = localStorage.getItem("token");
+            if (!token) throw new Error("Unauthorized");
+            setLoading(true);
+            const res = await client.get("/user/budgetsummaryIncome", {
+                headers: { Authorization: `Bearer ${JSON.parse(token)}` },
+            });
+            return res.data.data;
+        } catch (err: any) {
+            console.error("Error fetching income categories", err);
+            return Promise.reject(err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const getBudgetPeriods = async () => {
+        const token = localStorage.getItem("token");
+        if (!token) throw new Error("Unauthorized");
+        const res = await client.get("/user/budgetget", {
+            headers: { Authorization: `Bearer ${JSON.parse(token)}` },
+        });
+        return res.data.data as {
+            id: string;
+            label: string;
+            budget_amount: number;
+            startDate: string | null;
+            endDate: string | null;
+        }[];
+    };
+
+    const createBudgetItem = async (payload: {
+        plan_id: string;
+        category: string;
+        item: string;
+        amount: string;
+        source: "income" | "expense";
+        date: string;
+    }) => {
+        const token = localStorage.getItem("token");
+        if (!token) throw new Error("Unauthorized");
+        const res = await client.post("/user/budgetItemCreate", payload, {
+            headers: { Authorization: `Bearer ${JSON.parse(token)}` },
+        });
+        return res.data.data;
+    };
+
+
 
     return {
         loading,
@@ -784,8 +996,17 @@ const FollowFinanceItem = async (data: { item: string }) => {
         getFinanceItem,
         FollowFinanceItem,
         getItemFollowing,
-        unfollowFinanceItem
-
+        unfollowFinanceItem,
+        getChartData,
+        getBudgetPlans,
+        createBudgetPlan,
+        updateBudgetPlan,
+        deleteBudgetPlan,
+        getBudgetSummary,
+        getExpenseCategories,
+        getIncomeCategories,
+        getBudgetPeriods,
+        createBudgetItem,
     }
 
 }

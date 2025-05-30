@@ -11,16 +11,6 @@ import Modal from "./Modal";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
-export function generateRandomData(length: number, digits?: number): number[] {
-  if (!digits) digits = 3;
-  const min = Math.pow(10, digits - 1);
-  const max = Math.pow(10, digits) - 1;
-  return Array.from(
-    { length },
-    () => Math.floor(Math.random() * (max - min + 1)) + min
-  );
-}
-
 interface FollowedItem {
   id: string;
   fitem_id?: string;
@@ -29,6 +19,7 @@ interface FollowedItem {
   fitem_logo: string;
   fitem_type: string;
   fitem_description: string;
+  chartData?: { x: number; y: number }[]; // added for real data
 }
 
 interface FinanceItem {
@@ -41,8 +32,9 @@ interface FinanceItem {
   logo: string;
   status: string;
   isSelected?: boolean;
-  isAlreadyFollowed?: boolean; // Flag to track if already followed
+  isAlreadyFollowed?: boolean;
 }
+
 
 const StockCardCarousel = () => {
   const [followedItems, setFollowedItems] = useState<FollowedItem[]>([]);
@@ -51,106 +43,95 @@ const StockCardCarousel = () => {
   const [loading, setLoading] = useState(false);
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
 
-  const { getFinanceItem, FollowFinanceItem, getItemFollowing } = UseFinanceHook();
+  const { getFinanceItem, FollowFinanceItem, getItemFollowing, getChartData } = UseFinanceHook();
   const navigate = useNavigate();
+
+  // Load followed items and their chart data on mount
   useEffect(() => {
-    fetchFollowedItems();
+    const loadFollowed = async () => {
+      setLoading(true);
+      try {
+        const response = await getItemFollowing();
+        let items: FollowedItem[] = [];
+        if (response && Array.isArray(response)) {
+          items = Array.isArray(response[0]) ? response[0] : response;
+        } else if (response && typeof response === 'object') {
+          items = [response];
+        }
+        // Fetch chart data for each symbol
+        const now = Math.floor(Date.now() / 1000);
+        const oneMonthAgo = now - 30 * 24 * 3600;
+        const chartArrays = await Promise.all(
+          items.map(item =>
+            getChartData(item.fitem_symbol, "D", oneMonthAgo, now)
+          )
+        );
+        // Attach chartData to items
+        const itemsWithCharts = items.map((item, i) => ({
+          ...item,
+          chartData: chartArrays[i]
+        }));
+        setFollowedItems(itemsWithCharts);
+      } catch (error) {
+        console.error("Error loading followed items or charts:", error);
+        setFollowedItems([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadFollowed();
   }, []);
 
-  const fetchFollowedItems = async () => {
-    setLoading(true);
-    try {
-      const response = await getItemFollowing();
-      console.log("Followed items response:", response);
+  // const fetchFollowedItems = async () => {
+  //   setLoading(true);
+  //   try {
+  //     const response = await getItemFollowing();
+  //     console.log("Followed items response:", response);
 
-      // Handle different response formats
-      if (response && Array.isArray(response)) {
-        if (response.length > 0 && Array.isArray(response[0])) {
-          // If response is an array of arrays
-          setFollowedItems(response[0]);
-        } else {
-          // If response is a flat array
-          setFollowedItems(response);
-        }
-      } else if (response && typeof response === 'object' && !Array.isArray(response)) {
-        // If response is a single object, wrap it in an array
-        setFollowedItems([response]);
-      } else {
-        setFollowedItems([]);
-      }
-    } catch (error) {
-      console.error("Error fetching followed items:", error);
-      setFollowedItems([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+  //     // Handle different response formats
+  //     if (response && Array.isArray(response)) {
+  //       if (response.length > 0 && Array.isArray(response[0])) {
+  //         // If response is an array of arrays
+  //         setFollowedItems(response[0]);
+  //       } else {
+  //         // If response is a flat array
+  //         setFollowedItems(response);
+  //       }
+  //     } else if (response && typeof response === 'object' && !Array.isArray(response)) {
+  //       // If response is a single object, wrap it in an array
+  //       setFollowedItems([response]);
+  //     } else {
+  //       setFollowedItems([]);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error fetching followed items:", error);
+  //     setFollowedItems([]);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   const fetchAvailableItems = async () => {
     setLoading(true);
     try {
       const response = await getFinanceItem();
-      console.log("Available items response:", response);
-
       let items: FinanceItem[] = [];
-
-      // Handle different response formats
-      if (response) {
-        if (Array.isArray(response)) {
-          if (response.length > 0) {
-            if (Array.isArray(response[0])) {
-              // If response is an array of arrays
-              items = response[0];
-            } else {
-              // If response is a flat array of objects
-              items = response;
-            }
-          }
-        } else if (typeof response === 'object') {
-          // If response is an object with data
-          const responseData = response.data || response;
-          if (Array.isArray(responseData)) {
-            items = responseData;
-          } else {
-            // Single item as object
-            items = [responseData];
-          }
-        }
+      if (Array.isArray(response)) {
+        items = Array.isArray(response[0]) ? response[0] : response;
+      } else if (response && typeof response === 'object') {
+        const data = (response as any).data || response;
+        items = Array.isArray(data) ? data : [data];
       }
-
-      // Get IDs of items that are already followed - convert all to lowercase strings for comparison
-      const alreadyFollowedIds = followedItems.map(item => {
-        const id = item.fitem_id || String(item.id);
-        return String(id).toLowerCase();
-      });
-
-      console.log("Already followed IDs:", alreadyFollowedIds);
-
-      // Mark items that are already followed with more robust comparison
-      const itemsWithSelection = items.map((item: FinanceItem) => {
-        // Convert both IDs to lowercase strings for more reliable comparison
-        const itemId = String(item.id).toLowerCase();
-        const itemIdEn = item.idEn ? String(item.idEn).toLowerCase() : null;
-
-        // Check if this item is already being followed
-        const isAlreadyFollowed = !!(
-          alreadyFollowedIds.includes(itemId) ||
-          (itemIdEn && alreadyFollowedIds.includes(itemIdEn))
-        );
-
-        console.log(`Item ${item.name} (${item.id}): Already followed = ${isAlreadyFollowed}`);
-
-        return {
+      const alreadyIds = followedItems.map(item =>
+        String(item.fitem_id || item.id).toLowerCase()
+      );
+      setAvailableItems(
+        items.map(item => ({
           ...item,
-          isSelected: false, // Don't preselect anything
-          isAlreadyFollowed // New flag to track if already followed
-        };
-      });
-
-      // Set the available items state
-      setAvailableItems(itemsWithSelection);
-
-      // Clear selected items - we don't want to preselect already followed items
+          isSelected: false,
+          isAlreadyFollowed: alreadyIds.includes(String(item.id).toLowerCase())
+        }))
+      );
       setSelectedItems([]);
     } catch (error) {
       console.error("Error fetching available items:", error);
@@ -166,48 +147,36 @@ const StockCardCarousel = () => {
   };
 
   const handleItemSelection = (id: string, isAlreadyFollowed: boolean) => {
-    if (!id || isAlreadyFollowed) return; // Prevent selecting already followed items
-
-    setSelectedItems(prev => {
-      if (prev.includes(id)) {
-        return prev.filter(itemId => itemId !== id);
-      } else {
-        return [...prev, id];
-      }
-    });
+    if (!id || isAlreadyFollowed) return;
+    setSelectedItems(prev =>
+      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+    );
   };
 
   const handleFollowItems = async () => {
-    if (selectedItems.length === 0) {
-      return;
-    }
-
+    if (selectedItems.length === 0) return;
     setLoading(true);
     try {
-      // Convert array to string - backend expects a string that it will explode
-      const itemsToFollow = {
-        item: selectedItems.join(',') // Convert array to comma-separated string
-      };
-
       await toast.promise(
-        FollowFinanceItem(itemsToFollow),
+        FollowFinanceItem({ item: selectedItems.join(',') }),
         {
           pending: "Following items...",
           success: {
             render({ data }) {
-              return <div>{data as string}</div>;
-            },
+              // data is unknown, so cast to string (or ReactNode)
+              return <div>{String(data)}</div>;
+            }
           },
           error: {
             render({ data }) {
-              return <div>{data as string}</div>;
-            },
-          },
+              return <div>{String(data)}</div>;
+            }
+          }
         }
       );
-
-      // Refresh followed items
-      await fetchFollowedItems();
+      // Reload followed list
+      const newList = await getItemFollowing();
+      setFollowedItems(Array.isArray(newList) ? newList as FollowedItem[] : [newList as FollowedItem]);
       setIsModalOpen(false);
     } catch (error) {
       console.error("Error following items:", error);
@@ -274,27 +243,21 @@ const StockCardCarousel = () => {
             className="mySwiper"
           >
             {followedItems.map((item, index) => {
-              // Generate random chart data and determine styling
-              const chartData = generateRandomData(12);
-              // Generate a random change value to demonstrate UI
-              const randomChange = (Math.random() * 10 - 5).toFixed(2);
-              const isPositive = !randomChange.startsWith('-');
+              const changeVal = item.chartData?.length
+                ? item.chartData[item.chartData.length - 1].y - item.chartData[0].y
+                : 0;
+              const isPositive = changeVal >= 0;
 
-              // Determine background color based on stock type
-              let bgColor = "bg-[#a6f7e2]"; // Default
-              let textColor: string | undefined = undefined;
-
-              // Assign different colors based on fitem_type or other properties
-              if (item.fitem_type === "crypto") {
-                bgColor = "bg-yellow-200";
-              } else if (item.fitem_symbol?.includes("MS")) {
+              let bgColor = "bg-[#a6f7e2]";
+              let textColor: string | undefined;
+              if (item.fitem_type === "crypto") bgColor = "bg-yellow-200";
+              else if (item.fitem_symbol.includes("MS")) {
                 bgColor = "bg-purple-400";
                 textColor = "text-white";
-              } else if (index % 5 === 3) {
-                bgColor = "bg-[#c7ffa5]";
-              } else if (index % 5 === 4) {
-                bgColor = "bg-pink-200";
-              }
+              } else if (index % 5 === 3) bgColor = "bg-[#c7ffa5]";
+              else if (index % 5 === 4) bgColor = "bg-pink-200";
+
+              const chartData = item.chartData || [];
 
               return (
                 <SwiperSlide key={item.id || index} virtualIndex={index} className="flex">
@@ -315,7 +278,7 @@ const StockCardCarousel = () => {
                           {item.fitem_symbol || 'N/A'}
                         </p>
                         <p className={`font-bold text-sm ${isPositive ? "text-green-600" : "text-red-600"}`}>
-                          {isPositive ? `+${randomChange}` : randomChange}
+                          {isPositive ? `+${changeVal.toFixed(2)}` : changeVal.toFixed(2)}
                         </p>
                       </div>
                     </div>
@@ -325,12 +288,14 @@ const StockCardCarousel = () => {
                           Current Value
                         </span>
                         <p className={`${textColor ?? "text-gray-500"} font-bold text-2xl`}>
-                          {`$${(Math.random() * 200 + 50).toFixed(2)}`}
+                          {chartData.length
+                            ? `$${chartData[chartData.length - 1].y.toFixed(2)}`
+                            : '-'}
                         </p>
                       </div>
                       <div className="">
                         <StockAreaChart
-                          data={[{ name: item.fitem_name || 'Stock', data: chartData }]}
+                          data={[{ name: item.fitem_name, data: chartData }]}
                           color={textColor === "text-white" ? "#ffffff" : undefined}
                         />
                       </div>

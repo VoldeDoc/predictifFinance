@@ -5,13 +5,16 @@ export interface DailyLimitProps {
     currency?: string;
   }
 
-export interface SavingPlanItem {
+  export interface SavingPlanItem {
     id: string;
     name: string;
     target: number;
     current: number;
-    icon?: string; 
+    icon: string;
+    startDate?: string;
+    endDate?: string;
 }
+
 
 export interface Savings {
     savings?: number;

@@ -51,7 +51,7 @@ function generateChart(color: string | string[]): ApexOptions {
 interface StockChartProps {
   data: {
     name: string;
-    data: number[];
+    data: { x: number; y: number }[];
   }[];
   color?: string | string[];
   height?: string;

@@ -16,10 +16,23 @@ import TransactionTable from "./Tools/TransactionTable"
 import PieChart from "./Tools/PieChart"
 import RecentActivity from "./Tools/RecentActivity"
 import AnalyticsSparkline from "./Tools/AnalyticsChart"
+
+interface Summary {
+  income: number;
+  expense: number;
+  budgetamount: number;
+}
+
 const Dashboard = () => {
-  const { getUserDetails } = UseFinanceHook();
+  const { getUserDetails, getBudgetSummary } = UseFinanceHook();
   const router = useNavigate();
   const [showKycAlert, setShowKycAlert] = useState(false);
+
+  const [summary, setSummary] = useState<Summary>({ income: 0, expense: 0, budgetamount: 0 });
+
+  const [incomePct, setIncomePct] = useState(0);
+  const [expensePct, setExpensePct] = useState(0);
+  const [savingsPct, setSavingsPct] = useState(0);
 
   useEffect(() => {
     const fetchUserDetails = async () => {
@@ -36,6 +49,30 @@ const Dashboard = () => {
     fetchUserDetails();
   }, []);
 
+  useEffect(() => {
+    async function load() {
+      const data = await getBudgetSummary(); // { income, expense, budgetamount }
+      // pull last snapshot
+      const lastRaw = localStorage.getItem("lastSummary");
+      const last: Summary | null = lastRaw ? JSON.parse(lastRaw) : null;
+
+      // helper
+      const pct = (newVal: number, oldVal?: number) =>
+        oldVal && oldVal !== 0
+          ? Math.round(((newVal - oldVal) / oldVal) * 1000) / 10
+          : 0;
+
+      setIncomePct(pct(data.income, last?.income));
+      setExpensePct(pct(data.expense, last?.expense));
+      setSavingsPct(pct(data.budgetamount, last?.budgetamount));
+
+      setSummary(data);
+      localStorage.setItem("lastSummary", JSON.stringify(data));
+    }
+    load();
+  }, [getBudgetSummary]);
+
+
   return (
     <AuthLayout>
       <>
@@ -49,8 +86,8 @@ const Dashboard = () => {
               </div>
               <div className="ml-3">
                 <p className="text-amber-700 font-medium">
-                  Your KYC verification is incomplete. 
-                  <button 
+                  Your KYC verification is incomplete.
+                  <button
                     onClick={() => router("/kyc")}
                     className="ml-2 text-amber-800 underline font-semibold hover:text-amber-900"
                   >
@@ -76,79 +113,79 @@ const Dashboard = () => {
           <StockCardCarousel />
           {/* <FinancialOverview />
           <PortfolioAnalyticsWatchList /> */}
-             <div className="px-4 sm:px-6">
-                <div className="flex flex-col lg:flex-row gap-6">
-                    {/* First Column - 32% */}
-                    <div className="w-full lg:w-[32%]">
-                        <div className="bg-white p-4 rounded-lg shadow-sm">
-                            <CreditCard
-                                cardNumber="1234567890123456"
-                                cardholderName="John Doe"
-                                expiryDate="12/23"
-                                cvv="1234"
-                                cardType="VISA"
-                            size="sm"
-                            />
-                            <CreditCardBtn />
-                        </div>
-                        <div className="mt-6">
-                            <DailyLimit />
-                        </div>
-                        <div className="mt-6">
-                            <SavingPlan />
-                        </div>
-                    </div>
-
-                    {/* Second Column - 45% */}
-                    <div className="w-full lg:w-[45%]">
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <Card
-                                icon={<BanknotesIcon className="h-6 w-6 text-white" />}
-                                title="Total Income"
-                                amount={5840.75}
-                                percentageChange={3.2}
-                            />
-                            <Card
-                                icon={<WalletIcon className="h-6 w-6 text-white" />}
-                                title="Total Expense"
-                                amount={2350.00}
-                                percentageChange={1.8}
-                            />
-                            <Card
-                                icon={<CreditCardIcon className="h-6 w-6 text-white" />}
-                                title="Total Savings"
-                                amount={1490.25}
-                                percentageChange={-0.7}
-                            />
-                        </div>
-                        <div>
-                            <CashFlow />
-                        </div>
-
-                        <TransactionTable
-                            initialPageSize={4}
-                            maxHeight="350px"
-                        />
-                    </div>
-
-                    {/* Third Column - 22% */}
-                    <div className="w-full lg:w-[22%]">
-                        {/* Pie Chart with tabs */}
-                        <PieChart />
-
-                        <RecentActivity />
-                    </div>
+          <div className="px-4 sm:px-6">
+            <div className="flex flex-col lg:flex-row gap-6">
+              {/* First Column - 32% */}
+              <div className="w-full lg:w-[32%]">
+                <div className="bg-white p-4 rounded-lg shadow-sm">
+                  <CreditCard
+                    cardNumber="1234567890123456"
+                    cardholderName="John Doe"
+                    expiryDate="12/23"
+                    cvv="1234"
+                    cardType="VISA"
+                    size="sm"
+                  />
+                  <CreditCardBtn />
                 </div>
-                <div className="px-4 md:px-6 lg:px-4">
-                    <AnalyticsSparkline
-                        title="Analytics"
-                        maxY={50000}
-                        lineColor="#3B82F6"
-                        fillColor="#93C5FD"
-                    />
-
+                <div className="mt-6">
+                  <DailyLimit />
                 </div>
+                <div className="mt-6">
+                  <SavingPlan />
+                </div>
+              </div>
+
+              {/* Second Column - 45% */}
+              <div className="w-full lg:w-[45%]">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <Card
+                    icon={<BanknotesIcon className="h-6 w-6 text-white" />}
+                    title="Total Income"
+                    amount={summary.income}
+                    percentageChange={incomePct}
+                  />
+                  <Card
+                    icon={<WalletIcon className="h-6 w-6 text-white" />}
+                    title="Total Expense"
+                    amount={summary.expense}
+                    percentageChange={expensePct}
+                  />
+                  <Card
+                    icon={<CreditCardIcon className="h-6 w-6 text-white" />}
+                    title="Total Savings"
+                    amount={summary.budgetamount}
+                    percentageChange={savingsPct}
+                  />
+                </div>
+                <div>
+                  <CashFlow />
+                </div>
+
+                <TransactionTable
+                  initialPageSize={4}
+                  maxHeight="350px"
+                />
+              </div>
+
+              {/* Third Column - 22% */}
+              <div className="w-full lg:w-[22%]">
+                {/* Pie Chart with tabs */}
+                <PieChart />
+
+                <RecentActivity />
+              </div>
             </div>
+            <div className="px-4 md:px-6 lg:px-4">
+              <AnalyticsSparkline
+                title="Analytics"
+                maxY={50000}
+                lineColor="#3B82F6"
+                fillColor="#93C5FD"
+              />
+
+            </div>
+          </div>
         </div>
       </>
     </AuthLayout>
