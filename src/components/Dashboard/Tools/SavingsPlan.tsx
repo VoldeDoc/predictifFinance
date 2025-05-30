@@ -21,6 +21,7 @@ export default function SavingPlan({ currency = "$" }: Savings) {
   const [plans, setPlans] = useState<
     (SavingPlanItem & { startDate?: string; endDate?: string })[]
   >([]);
+  
   const [loading, setLoading] = useState(false);
   const [activePlanMenu, setActivePlanMenu] = useState<string | null>(null);
 

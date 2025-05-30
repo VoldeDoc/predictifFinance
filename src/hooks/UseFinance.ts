@@ -810,8 +810,15 @@ const UseFinanceHook = () => {
         }
     };
 
+
     const createBudgetPlan = async (
-        data: { label: string; budget_amount: string }
+        data: {
+            label: string;
+            budget_amount: string;
+            detail?: string;
+            startDate?: string;
+            endDate?: string;
+        }
     ): Promise<any> => {
         try {
             const token = localStorage.getItem("token");
@@ -820,9 +827,7 @@ const UseFinanceHook = () => {
             const response = await client.post(
                 "/user/budgetCreate",
                 data,
-                {
-                    headers: { Authorization: `Bearer ${JSON.parse(token)}` }
-                }
+                { headers: { Authorization: `Bearer ${JSON.parse(token)}` } }
             );
             return response.data.data;
         } catch (err: any) {
