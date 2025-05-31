@@ -11,6 +11,16 @@ import Modal from "./Modal";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
+export function generateRandomData(length: number, digits?: number): number[] {
+  if (!digits) digits = 3;
+  const min = Math.pow(10, digits - 1);
+  const max = Math.pow(10, digits) - 1;
+  return Array.from(
+    { length },
+    () => Math.floor(Math.random() * (max - min + 1)) + min
+  );
+}
+
 interface FollowedItem {
   id: string;
   fitem_id?: string;
@@ -191,7 +201,7 @@ const StockCardCarousel = () => {
         <h1 className="text-2xl font-bold text-gray-800">My Stocks</h1>
         <div className="flex space-x-3">
           <button
-            onClick={() => navigate("/strategies/create")}
+            onClick={() => navigate("/strategies")}
             className="bg-[#6425fe] text-white px-4 py-2 rounded-lg flex items-center gap-2"
           >
             <FaPlus size={14} />

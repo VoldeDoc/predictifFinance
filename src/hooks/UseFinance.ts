@@ -7,6 +7,14 @@ import { RootState } from "@/context/store/rootReducer";
 import { useSelector } from "react-redux";
 import axios from "axios";
 
+export interface BudgetPlanPayload {
+    label: string;
+    budget_amount: string;
+    detail?: string;
+    startDate?: string;
+    endDate?: string;
+}
+
 const UseFinanceHook = () => {
     const client = axiosClient();
     const [loading, setLoading] = useState(false);
@@ -754,11 +762,12 @@ const UseFinanceHook = () => {
     }
 
 
+    // UPDATED (fixed) signature:
     const getChartData = async (
         symbol: string,
-        resolution: string = "D",
-        from: number,
-        to: number
+        _resolution: string = "D",
+        _from?: number,
+        _to?: number
     ): Promise<{ x: number; y: number }[]> => {
         setLoading(true);
         try {
@@ -777,6 +786,8 @@ const UseFinanceHook = () => {
             const timeSeries = response.data["Time Series (Daily)"];
             if (!timeSeries) return [];
 
+            // (Optional) If you want to filter by `from`/`to`, you could do it here,
+            // but the call below simply ignores them and returns the full reversed series.
             const result = Object.entries(timeSeries).map(([date, value]: any) => ({
                 x: new Date(date).getTime(),
                 y: parseFloat(value["4. close"])
@@ -791,6 +802,7 @@ const UseFinanceHook = () => {
             setLoading(false);
         }
     };
+
 
     const getBudgetPlans = async () => {
         try {
@@ -810,15 +822,8 @@ const UseFinanceHook = () => {
         }
     };
 
-
     const createBudgetPlan = async (
-        data: {
-            label: string;
-            budget_amount: string;
-            detail?: string;
-            startDate?: string;
-            endDate?: string;
-        }
+        data: BudgetPlanPayload
     ): Promise<any> => {
         try {
             const token = localStorage.getItem("token");

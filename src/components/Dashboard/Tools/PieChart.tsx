@@ -48,8 +48,7 @@ export default function PieChart(_: PieChartProps) {
   const [formAmount, setFormAmount] = useState('');
   const [formDate, setFormDate] = useState('');
   const [saveloading, setSaveloading] = useState(false);
-  // const [categoriesList, setCategoriesList] = useState<string[]>([]);
-
+  
   useEffect(() => {
     // load categories & periods
     (async () => {

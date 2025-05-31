@@ -1,32 +1,42 @@
+// src/components/Dashboard/Tools/FinancialOverview.tsx
+
 import { Tabs } from "flowbite-react";
 import { FaChevronRight } from "react-icons/fa6";
 import { StockAreaChart } from "@/components/Chart/StockAreaChart";
-import { generateRandomData } from "./StockCardCarousel";
 import AreaChart from "@/components/Chart/AreaChart";
 import { customPillsTabTheme } from "@/utils/FlowBiteCustomThemes";
 
+// (1) Remove the broken import of generateRandomData
+// import { generateRandomData } from "./StockCardCarousel";
+
 const FinancialOverview = () => {
-  const nasdaqData = {
-    name: "NASDAQ",
-    data: generateRandomData(7, 5), // Generate 7 random 5-digit numbers
+  // Local helper to generate N random numbers up to (10^digits - 1)
+  const generateRandomNumbers = (count: number, digits: number): number[] => {
+    const max = Math.pow(10, digits);
+    return Array.from({ length: count }).map(
+      () => Math.floor(Math.random() * max)
+    );
   };
 
-  const sseData = {
-    name: "SSE",
-    data: generateRandomData(7, 5), // Generate 7 random 5-digit numbers
-  };
+  // Build "NASDAQ", "SSE", etc. as plain number[] series (for <AreaChart>).
+  const nasdaqDataNumbers = generateRandomNumbers(7, 5);
+  const sseDataNumbers = generateRandomNumbers(7, 5);
+  const euronextDataNumbers = generateRandomNumbers(7, 5);
+  const bseDataNumbers = generateRandomNumbers(7, 5);
 
-  const euronextData = {
-    name: "Euronext",
-    data: generateRandomData(7, 5), // Generate 7 random 5-digit numbers
-  };
+  // Wrap each in the shape <AreaChart> expects: { name: string; data: number[] }
+  const nasdaqData = { name: "NASDAQ", data: nasdaqDataNumbers };
+  const sseData = { name: "SSE", data: sseDataNumbers };
+  const euronextData = { name: "Euronext", data: euronextDataNumbers };
+  const bseData = { name: "BSE", data: bseDataNumbers };
 
-  const bseData = {
-    name: "BSE",
-    data: generateRandomData(7, 5), // Generate 7 random 5-digit numbers
-  };
-
-
+  // For Tesla, we need { x, y } points inside an array, then wrap in a one‐element array for StockAreaChart
+  const teslaNumbers = generateRandomNumbers(9, 3);
+  const teslaDataPoints = teslaNumbers.map((value, index) => ({
+    x: index,
+    y: value,
+  }));
+  const teslaSeries = [{ name: "Tesla Inc", data: teslaDataPoints }];
 
   return (
     <div className="container mx-auto p-4 row gap-5 justify-center">
@@ -41,6 +51,7 @@ const FinancialOverview = () => {
             +5.63%
           </p>
         </div>
+
         <p className="text-lg font-medium mt-5">Invested</p>
         <div className="flex justify-between items-center mt-2 mb-4 rounded-lg text-white py-3 bg-gray-800">
           <p className="text-3xl ml-6">$7,532.21</p>
@@ -48,6 +59,7 @@ const FinancialOverview = () => {
             <FaChevronRight />
           </button>
         </div>
+
         <div>
           <p className="text-md text-gray-500 font-semibold">Top Stock</p>
           <div className="flex flex-grow justify-between items-center mb-3 mt-5">
@@ -62,11 +74,10 @@ const FinancialOverview = () => {
               <p className="text-sm text-green-600">+17.63</p>
             </div>
           </div>
+
           <div className="row flex-grow justify-between items-center mb-3">
             <div className="col-lg-4">
-              <p className="text-gray-400 text-sm font-medium">
-                Invested Value
-              </p>
+              <p className="text-gray-400 text-sm font-medium">Invested Value</p>
               <p className="text-lg font-semibold">$29.34</p>
             </div>
             <div className="col-lg-4">
@@ -74,13 +85,9 @@ const FinancialOverview = () => {
               <p className="text-lg font-semibold">$34.56</p>
             </div>
             <div className="col-lg-4">
+              {/* (2) Wrap teslaSeries in an array for StockAreaChart */}
               <StockAreaChart
-                data={[
-                  {
-                    name: "Tesla Inc",
-                    data: generateRandomData(9, 3), // Generate 9 random 3-digit numbers
-                  },
-                ]}
+                data={teslaSeries}
                 color="#77b900"
               />
             </div>
@@ -127,6 +134,7 @@ const FinancialOverview = () => {
               </div>
             </div>
           </Tabs.Item>
+
           <Tabs.Item title="SSE">
             <div className="flex gap-8 mb-4 flex-wrap">
               <button className="text-[#6425fe] text-xl">1D</button>
@@ -163,6 +171,7 @@ const FinancialOverview = () => {
               </div>
             </div>
           </Tabs.Item>
+
           <Tabs.Item title="Euronext">
             <div className="flex gap-8 mb-4 flex-wrap">
               <button className="text-[#6425fe] text-xl">1D</button>
@@ -199,6 +208,7 @@ const FinancialOverview = () => {
               </div>
             </div>
           </Tabs.Item>
+
           <Tabs.Item title="BSE">
             <div className="flex gap-8 mb-4 flex-wrap">
               <button className="text-[#6425fe] text-xl">1D</button>
