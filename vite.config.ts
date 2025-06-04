@@ -16,11 +16,18 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      '/api': {
-        target: 'https://dash.predictif.ai',
+      // your existing /api proxy
+      "/api": {
+        target: "https://dash.predictif.ai",
         changeOrigin: true,
         secure: false,
-        rewrite: path => path.replace(/^\/api/, '/api'),
+        rewrite: (path) => path.replace(/^\/api/, "/api"),
+      },
+      // ← catch “/alpha/*” and forward it to alphavantage.co
+      "/alpha": {
+        target: "https://www.alphavantage.co",
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/alpha/, ""),
       },
     },
   },

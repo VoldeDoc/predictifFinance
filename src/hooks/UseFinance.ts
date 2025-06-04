@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 import { RootState } from "@/context/store/rootReducer";
 import { useSelector } from "react-redux";
 import axios from "axios";
+import type { Stripe, StripeCardElement } from "@stripe/stripe-js";
 
 export interface BudgetPlanPayload {
     label: string;
@@ -14,6 +15,15 @@ export interface BudgetPlanPayload {
     startDate?: string;
     endDate?: string;
 }
+
+// let stripePromise: Promise<Stripe | null> | null = null;
+// function getStripe() {
+//   if (!stripePromise) {
+//     // ← Replace with your real Stripe publishable key:
+//     stripePromise = loadStripe("pk_test_51QfeEiJPjkyacDG1OLhLDqppvm1eMOROsU1daEGZkPnMKEGdNirwh4dSIxDE5v70EEhPo0Hhf2DoaHnkM9uMaWKm00g3E9yAFi");
+//   }
+//   return stripePromise;
+// }
 
 const UseFinanceHook = () => {
     const client = axiosClient();
@@ -772,16 +782,14 @@ const UseFinanceHook = () => {
         setLoading(true);
         try {
             const apiKey = "SLINNRNUBVZ04IKX";
-            const response = await axios.get(
-                `https://www.alphavantage.co/query`, {
+            const response = await axios.get("/alpha/query", {
                 params: {
                     function: "TIME_SERIES_DAILY",
                     symbol,
                     apikey: apiKey,
-                    outputsize: "compact"
-                }
-            }
-            );
+                    outputsize: "compact",
+                },
+            });
 
             const timeSeries = response.data["Time Series (Daily)"];
             if (!timeSeries) return [];
@@ -798,6 +806,26 @@ const UseFinanceHook = () => {
         catch (err: any) {
             console.error("Error fetching chart data for", symbol, err);
             return [];
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const getStockMeta = async (symbol: string) => {
+        setLoading(true);
+        try {
+            const apiKey = "SLINNRNUBVZ04IKX";
+            const res = await axios.get("/alpha/query", {
+                params: {
+                    function: "OVERVIEW",
+                    symbol,
+                    apikey: apiKey,
+                },
+            });
+            return res.data;
+        } catch (err) {
+            console.error("Error fetching stock overview for", symbol, err);
+            return null;
         } finally {
             setLoading(false);
         }
@@ -973,6 +1001,119 @@ const UseFinanceHook = () => {
         return res.data.data;
     };
 
+    const createStripePaymentIntent = async (amount: number) => {
+        try {
+            const token = localStorage.getItem("token");
+            if (!token) throw new Error("Not authenticated");
+
+            const resp = await client.post(
+                "/payment/stripe-payment-intent",
+                { amount },
+                { headers: { Authorization: `Bearer ${JSON.parse(token)}` } }
+            );
+            const { clientSecret } = resp.data as { clientSecret: string };
+            if (!clientSecret) throw new Error("No clientSecret returned");
+            return clientSecret;
+        } catch (err) {
+            console.error("Error creating PaymentIntent:", err);
+            throw err;
+        }
+    };
+
+    const confirmStripePaymentOnBackend = async (reference: string) => {
+        try {
+            const token = localStorage.getItem("token");
+            if (!token) throw new Error("Not authenticated");
+
+            await client.post(
+                "/payment/stripe-payment-confirm",
+                { reference },
+                { headers: { Authorization: `Bearer ${JSON.parse(token)}` } }
+            );
+        } catch (err) {
+            console.error("Error confirming payment on backend:", err);
+            throw err;
+        }
+    };
+
+
+    const recordDeposit = async (amount: number) => {
+        try {
+            const token = localStorage.getItem("token");
+            if (!token) throw new Error("Not authenticated");
+
+            await client.post(
+                "/user/deposit",
+                { amount, detail: "" },
+                { headers: { Authorization: `Bearer ${JSON.parse(token)}` } }
+            );
+        } catch (err) {
+            console.error("Error recording deposit:", err);
+            throw err;
+        }
+    };
+
+    const topUp = async (
+        stripe: Stripe,
+        cardElement: StripeCardElement,
+        amount: number
+      ) => {
+        try {
+          // 1) Create a PaymentIntent on your backend
+          const clientSecret = await createStripePaymentIntent(amount);
+          console.log("clientSecret from backend:", clientSecret);
+    
+          // 2) Confirm the payment _using the exact same_ stripe instance
+          const { error, paymentIntent } = await stripe.confirmCardPayment(
+            clientSecret,
+            {
+              payment_method: {
+                card: cardElement,
+              },
+            }
+          );
+          if (error) {
+            console.error("Stripe confirmCardPayment error:", error);
+            throw error;
+          }
+          if (!paymentIntent) {
+            throw new Error(
+              "No PaymentIntent returned after confirmCardPayment"
+            );
+          }
+    
+          // 3) Notify your backend that the payment succeeded
+          await confirmStripePaymentOnBackend(paymentIntent.id);
+    
+          // 4) Record the deposit in your app’s own system
+          await recordDeposit(amount);
+        } catch (err) {
+          console.error("Top‐up failed:", err);
+          throw err;
+        }
+      };
+
+    const getDepositTransactions = async () => {
+        const token = localStorage.getItem("token");
+        if (!token) throw new Error("Not authenticated");
+
+        const res = await client.get("/user/gettransactions/deposit", {
+            headers: { Authorization: `Bearer ${JSON.parse(token)}` },
+        });
+        // res.data.data is the array of raw transactions
+        return res.data.data as Array<{
+            id: string;
+            ref: string;
+            amount: number;
+            detail: string | null;
+            type: string;       // e.g. "deposit"
+            status: string;     // e.g. "pending", "completed", etc.
+            item_id: string | null;
+            user_ref_id: string;
+            created_at: string; // ISO timestamp, e.g. "2025-06-03T21:05:17.000000Z"
+            updated_at: string;
+        }>;
+    };
 
 
     return {
@@ -1017,6 +1158,12 @@ const UseFinanceHook = () => {
         getIncomeCategories,
         getBudgetPeriods,
         createBudgetItem,
+        getStockMeta,
+        createStripePaymentIntent,
+        confirmStripePaymentOnBackend,
+        recordDeposit,
+        topUp,
+        getDepositTransactions,
     }
 
 }

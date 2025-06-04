@@ -11,8 +11,6 @@ import { CardsComponent } from "./compon/CardsComponent";
 import { SettingsComponent } from "./compon/SettingsCmponent";
 
 
-
-
 const PredictiveAccount = () => {
   const [activeTab, setActiveTab] = useState("accounts");
   const [darkMode, setDarkMode] = useState(false);

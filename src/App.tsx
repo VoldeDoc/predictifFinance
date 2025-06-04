@@ -23,6 +23,7 @@ import CourseDetail from "./components/Education/Tool/courseDetail";
 import MarketNews from "./components/MarketNews/MarketNews";
 import MarketNewsDetails from "./components/MarketNews/MarketNewsDetails";
 import AnalysisDetailsPage from "./pages/analysis";
+import AnalysisDetailsPage1 from "./components/Dashboard/Tools/AnalysisDetailsPage";
 import Analysis from "./components/Analysis/Analysis";
 import OtpVerification from "./components/Auth/OtpVerification";
 import ProtectedRoute from "./services/protected-auth";
@@ -47,6 +48,7 @@ import AssignRolesPage from "./components/ForumGroup/Groip/AssignRole";
 import Strategies from "./components/Strategy/strategies";
 import Profile from "./components/Profile/profile";
 import ForgetPwdOtpVerification from "./components/Auth/ForgetPwdOtpVerification";
+import TopUpForm from "./components/Dashboard/Tools/TopUpForm";
 
 
 function App() {
@@ -91,6 +93,7 @@ function App() {
               <Route path="/investing" element={<ProtectedRoute><Investment /></ProtectedRoute>} />
 
               <Route path="/dashboard" element={<ProtectedRoute><Dashboard_T /></ProtectedRoute>} />
+              <Route path="/top-up" element={<ProtectedRoute><TopUpForm /></ProtectedRoute>} />
               <Route path="/stock" element={<ProtectedRoute><Stocking /></ProtectedRoute>} />
               <Route path="/market-zone" element={<ProtectedRoute><Market /></ProtectedRoute>} />
               {/* <Route path="/dashboard2" element={<ProtectedRoute><Dashboard2Page /></ProtectedRoute>} /> */}
@@ -102,6 +105,7 @@ function App() {
               <Route path="/market-news" element={<ProtectedRoute><MarketNews /></ProtectedRoute>} />
               <Route path="/market-news/details" element={<ProtectedRoute><MarketNewsDetails /></ProtectedRoute>} />
               <Route path="/analysis/details" element={<ProtectedRoute><AnalysisDetailsPage /></ProtectedRoute>} />
+              <Route path="/analysis/stock_details" element={<ProtectedRoute><AnalysisDetailsPage1 /></ProtectedRoute>} />
               <Route path="/analysis" element={<ProtectedRoute><Analysis /></ProtectedRoute>} />
 
 
