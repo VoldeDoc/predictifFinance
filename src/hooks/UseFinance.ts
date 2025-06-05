@@ -1020,38 +1020,37 @@ const UseFinanceHook = () => {
         }
     };
 
-    const confirmStripePaymentOnBackend = async (reference: string) => {
+    const createDepositAction = async (amount: number): Promise<{ id: string; ref: string; type: string }> => {
         try {
-            const token = localStorage.getItem("token");
-            if (!token) throw new Error("Not authenticated");
-
-            await client.post(
-                "/payment/stripe-payment-confirm",
-                { reference },
-                { headers: { Authorization: `Bearer ${JSON.parse(token)}` } }
-            );
+          const token = localStorage.getItem("token");
+          if (!token) throw new Error("Not authenticated");
+      
+          const resp = await client.post(
+            "/user/deposit",
+            { amount, detail: "" },
+            { headers: { Authorization: `Bearer ${JSON.parse(token)}` } }
+          );
+          return resp.data.data as { id: string; ref: string; type: string };
         } catch (err) {
-            console.error("Error confirming payment on backend:", err);
-            throw err;
+          console.error("Error recording deposit:", err);
+          throw err;
         }
-    };
-
-
-    const recordDeposit = async (amount: number) => {
-        try {
-            const token = localStorage.getItem("token");
-            if (!token) throw new Error("Not authenticated");
-
-            await client.post(
-                "/user/deposit",
-                { amount, detail: "" },
-                { headers: { Authorization: `Bearer ${JSON.parse(token)}` } }
-            );
-        } catch (err) {
-            console.error("Error recording deposit:", err);
-            throw err;
-        }
-    };
+      };
+      
+      const confirmStripePaymentOnBackend = async (action_id: string, action: string, reference: string) => {
+        const token = localStorage.getItem("token");
+        if (!token) throw new Error("Not authenticated");
+      
+        await client.post(
+          "/payment/stripe-payment-confirm",
+          {
+            action_id,
+            action,
+            reference,   // <-- this should be the deposit’s `ref`, not the PI ID
+          },
+          { headers: { Authorization: `Bearer ${JSON.parse(token)}` } }
+        );
+      };
 
     const topUp = async (
         stripe: Stripe,
@@ -1059,17 +1058,13 @@ const UseFinanceHook = () => {
         amount: number
       ) => {
         try {
-          // 1) Create a PaymentIntent on your backend
           const clientSecret = await createStripePaymentIntent(amount);
           console.log("clientSecret from backend:", clientSecret);
-    
-          // 2) Confirm the payment _using the exact same_ stripe instance
+      
           const { error, paymentIntent } = await stripe.confirmCardPayment(
             clientSecret,
             {
-              payment_method: {
-                card: cardElement,
-              },
+              payment_method: { card: cardElement },
             }
           );
           if (error) {
@@ -1077,22 +1072,19 @@ const UseFinanceHook = () => {
             throw error;
           }
           if (!paymentIntent) {
-            throw new Error(
-              "No PaymentIntent returned after confirmCardPayment"
-            );
+            throw new Error("No PaymentIntent returned after confirmCardPayment");
           }
-    
-          // 3) Notify your backend that the payment succeeded
-          await confirmStripePaymentOnBackend(paymentIntent.id);
-    
-          // 4) Record the deposit in your app’s own system
-          await recordDeposit(amount);
+      
+          const { id: action_id, ref, type: action } = await createDepositAction(amount);
+      
+          await confirmStripePaymentOnBackend(action_id, action, ref);
+      
         } catch (err) {
           console.error("Top‐up failed:", err);
           throw err;
         }
       };
-
+      
     const getDepositTransactions = async () => {
         const token = localStorage.getItem("token");
         if (!token) throw new Error("Not authenticated");
@@ -1161,7 +1153,7 @@ const UseFinanceHook = () => {
         getStockMeta,
         createStripePaymentIntent,
         confirmStripePaymentOnBackend,
-        recordDeposit,
+        createDepositAction,
         topUp,
         getDepositTransactions,
     }

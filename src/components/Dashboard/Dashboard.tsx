@@ -163,7 +163,7 @@ const Dashboard = () => {
                 </div>
 
                 <TransactionTable
-                  initialPageSize={4}
+                  initialPageSize={5}
                   maxHeight="350px"
                 />
               </div>
