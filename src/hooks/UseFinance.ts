@@ -1036,7 +1036,6 @@ const UseFinanceHook = () => {
 
     // 3) Tell your backend “Stripe payment succeeded,” passing the PI ID
     const confirmStripePaymentOnBackend = async (
-        action_id: string,
         action: string,
         payment_intent_id: string
     ) => {
@@ -1058,9 +1057,9 @@ const UseFinanceHook = () => {
     ) => {
         try {
             // A) Create deposit record and grab its id/ref/type
-            const { id: action_id, ref: depositRef, type: action } =
+            const { ref: depositRef, type: action } =
                 await createDepositAction(amount);
-            console.log("Created deposit action:", { action_id, depositRef, action });
+            console.log("Created deposit action:", { depositRef, action });
 
             // B) Ask backend for a PaymentIntent, passing depositRef
             const clientSecret = await createStripePaymentIntent(amount, depositRef);
@@ -1082,7 +1081,6 @@ const UseFinanceHook = () => {
 
             // D) Notify backend that payment succeeded
             await confirmStripePaymentOnBackend(
-                action_id,
                 action,
                 paymentIntent.id
             );
