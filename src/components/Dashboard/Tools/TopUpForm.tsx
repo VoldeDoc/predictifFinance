@@ -17,22 +17,18 @@ export default function TopUpForm() {
 
     const [rawAmount, setRawAmount] = useState("0");
     const [loading, setLoading] = useState(false);
-    const [errorMsg, setErrorMsg] = useState<string | null>(null);
-    const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setErrorMsg(null);
-        setSuccessMsg(null);
     
         if (!stripe || !elements) {
-          setErrorMsg("Stripe.js not yet loaded");
+          toast.error("Stripe.js not yet loaded");
           return;
         }
     
         const val = Number(rawAmount);
         if (isNaN(val) || val <= 0) {
-          setErrorMsg("Please enter a positive amount.");
+          toast.error("Please enter a positive amount.");
           toast.error("Please enter a positive amount.")
           return;
         }
@@ -41,20 +37,17 @@ export default function TopUpForm() {
     
         const cardElement = elements.getElement(CardElement);
         if (!cardElement) {
-          setErrorMsg("Card details not available.");
-          toast.error("Card details not available.")
+          toast.error("Card details not available.");
           return;
         }
     
         setLoading(true);
         try {
           await topUp(stripe, cardElement, amountInDollar);
-          setSuccessMsg(`Successfully topped up $${val.toFixed(2)}!`);
           toast.success(`Successfully topped up $${val.toFixed(2)}!`)
           navigate('/dashboard')
           
         } catch (err: any) {
-          setErrorMsg(err.message || "Top-up failed.");
           toast.error(err.message || "Top-up failed.")
         } finally {
           setLoading(false);
