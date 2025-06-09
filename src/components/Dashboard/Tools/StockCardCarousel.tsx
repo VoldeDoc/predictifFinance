@@ -305,7 +305,7 @@ const StockCardCarousel = () => {
                         <p className={`${textColor ?? "text-gray-500"} font-bold text-2xl`}>
                           {chartData.length
                             ? `$${chartData[chartData.length - 1].y.toFixed(2)}`
-                            : '-'}
+                            : 'N/A'}
                         </p>
                       </div>
                       <div className="">
