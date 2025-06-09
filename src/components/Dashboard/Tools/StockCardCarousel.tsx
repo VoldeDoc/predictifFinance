@@ -275,6 +275,7 @@ const StockCardCarousel = () => {
                   onClick={() =>
                     navigate(`/analysis/stock_details?symbol=${item.fitem_symbol}`)
                   }
+                  title="Tap to view details"
                   className={`p-4 rounded-lg shadow-lg ${bgColor} w-full h-full cursor-pointer`}>
                     <div className="flex flex-grow justify-between items-center mb-3">
                       <div className="flex justify-between gap-2 items-center">

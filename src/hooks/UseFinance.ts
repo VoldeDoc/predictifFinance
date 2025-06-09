@@ -1001,90 +1001,161 @@ const UseFinanceHook = () => {
         return res.data.data;
     };
 
-    const createStripePaymentIntent = async (amount: number) => {
-        try {
-            const token = localStorage.getItem("token");
-            if (!token) throw new Error("Not authenticated");
+    // 1) Create the deposit record first
+    const createDepositAction = async (
+        amount: number
+    ): Promise<{ id: string; ref: string; type: string }> => {
+        const token = localStorage.getItem("token");
+        if (!token) throw new Error("Not authenticated");
 
-            const resp = await client.post(
-                "/payment/stripe-payment-intent",
-                { amount },
-                { headers: { Authorization: `Bearer ${JSON.parse(token)}` } }
-            );
-            const { clientSecret } = resp.data as { clientSecret: string };
-            if (!clientSecret) throw new Error("No clientSecret returned");
-            return clientSecret;
-        } catch (err) {
-            console.error("Error creating PaymentIntent:", err);
-            throw err;
-        }
-    };
-
-    const createDepositAction = async (amount: number): Promise<{ id: string; ref: string; type: string }> => {
-        try {
-          const token = localStorage.getItem("token");
-          if (!token) throw new Error("Not authenticated");
-      
-          const resp = await client.post(
+        const resp = await client.post(
             "/user/deposit",
             { amount, detail: "" },
             { headers: { Authorization: `Bearer ${JSON.parse(token)}` } }
-          );
-          return resp.data.data as { id: string; ref: string; type: string };
-        } catch (err) {
-          console.error("Error recording deposit:", err);
-          throw err;
-        }
-      };
-      
-      const confirmStripePaymentOnBackend = async (action_id: string, action: string, reference: string) => {
+        );
+        return resp.data.data as { id: string; ref: string; type: string };
+    };
+
+    // 2) Create Stripe PaymentIntent, passing amount + the deposit `ref`
+    const createStripePaymentIntent = async (
+        amount: number,
+        depositRef: string
+    ): Promise<string> => {
         const token = localStorage.getItem("token");
         if (!token) throw new Error("Not authenticated");
-      
-        await client.post(
-          "/payment/stripe-payment-confirm",
-          {
-            action_id,
-            action,
-            reference,   // <-- this should be the deposit’s `ref`, not the PI ID
-          },
-          { headers: { Authorization: `Bearer ${JSON.parse(token)}` } }
-        );
-      };
 
+        const resp = await client.post(
+            "/payment/stripe-payment-intent",
+            { amount, reference: depositRef },
+            { headers: { Authorization: `Bearer ${JSON.parse(token)}` } }
+        );
+        const { clientSecret } = resp.data as { clientSecret: string };
+        if (!clientSecret) throw new Error("No clientSecret returned");
+        return clientSecret;
+    };
+
+    // 3) Tell your backend “Stripe payment succeeded,” passing the PI ID
+    const confirmStripePaymentOnBackend = async (
+        action_id: string,
+        action: string,
+        payment_intent_id: string
+    ) => {
+        const token = localStorage.getItem("token");
+        if (!token) throw new Error("Not authenticated");
+
+        await client.post(
+            "/payment/stripe-payment-confirm",
+            { payment_intent_id, action },
+            { headers: { Authorization: `Bearer ${JSON.parse(token)}` } }
+        );
+    };
+
+    // 4) Glue it all together
     const topUp = async (
         stripe: Stripe,
         cardElement: StripeCardElement,
         amount: number
-      ) => {
+    ) => {
         try {
-          const clientSecret = await createStripePaymentIntent(amount);
-          console.log("clientSecret from backend:", clientSecret);
-      
-          const { error, paymentIntent } = await stripe.confirmCardPayment(
-            clientSecret,
-            {
-              payment_method: { card: cardElement },
+            // A) Create deposit record and grab its id/ref/type
+            const { id: action_id, ref: depositRef, type: action } =
+                await createDepositAction(amount);
+            console.log("Created deposit action:", { action_id, depositRef, action });
+
+            // B) Ask backend for a PaymentIntent, passing depositRef
+            const clientSecret = await createStripePaymentIntent(amount, depositRef);
+            console.log("Got clientSecret:", clientSecret);
+
+            // C) Confirm card payment in the browser
+            const { error, paymentIntent } = await stripe.confirmCardPayment(
+                clientSecret,
+                { payment_method: { card: cardElement } }
+            );
+            if (error) {
+                console.error("Stripe confirmCardPayment error:", error);
+                throw error;
             }
-          );
-          if (error) {
-            console.error("Stripe confirmCardPayment error:", error);
-            throw error;
-          }
-          if (!paymentIntent) {
-            throw new Error("No PaymentIntent returned after confirmCardPayment");
-          }
-      
-          const { id: action_id, ref, type: action } = await createDepositAction(amount);
-      
-          await confirmStripePaymentOnBackend(action_id, action, ref);
-      
+            if (!paymentIntent) {
+                throw new Error("No PaymentIntent returned after confirmCardPayment");
+            }
+            console.log("Confirmed PaymentIntent:", paymentIntent.id);
+
+            // D) Notify backend that payment succeeded
+            await confirmStripePaymentOnBackend(
+                action_id,
+                action,
+                paymentIntent.id
+            );
+
+            console.log("Top-up completed successfully!");
         } catch (err) {
-          console.error("Top‐up failed:", err);
-          throw err;
+            console.error("Top-up failed:", err);
+            throw err;
         }
-      };
-      
+    };
+
+
+
+    // const topUp = async (
+    //     stripe: Stripe,
+    //     cardElement: StripeCardElement,
+    //     amount: number
+    //   ) => {
+    //     try {
+    //       // (A) Ask our backend to create a PaymentIntent and return its clientSecret:
+    //       const clientSecret = await createStripePaymentIntent(amount);
+    //       console.log("clientSecret from backend:", clientSecret);
+
+    //       // (B) Confirm the payment in the browser:
+    //       const { error, paymentIntent: partialPI } = await stripe.confirmCardPayment(
+    //         clientSecret,
+    //         { payment_method: { card: cardElement } }
+    //       );
+
+    //       if (error) {
+    //         console.error("Stripe confirmCardPayment error:", error);
+    //         throw error;
+    //       }
+    //       if (!partialPI) {
+    //         throw new Error("No PaymentIntent returned after confirmCardPayment");
+    //       }
+    //       console.log("confirmed PaymentIntent (no need to expand yet):", partialPI);
+
+    //       // (C) Retrieve that same PaymentIntent again (this time we get the fully populated object).
+    //       //     stripe.retrievePaymentIntent only takes a single argument (the clientSecret),
+    //       //     so we must not pass a second “expand” parameter here.
+    //       const { paymentIntent: fullPI } = await stripe.retrievePaymentIntent(clientSecret);
+
+    //       if (!fullPI) {
+    //         throw new Error("Unable to retrieve the full PaymentIntent");
+    //       }
+    //       console.log("fetched full PaymentIntent:", fullPI);
+
+    //       // (D) Pull out the Charge ID from fullPI.charges.data[0].id.
+    //       //     We have to cast to `any` because TypeScript’s built-in `PaymentIntent` type
+    //       //     does not include `.charges`.
+    //       const chargeList = (fullPI as any).charges?.data;
+    //       const chargeId = Array.isArray(chargeList) && chargeList[0]?.id;
+    //       if (!chargeId) {
+    //         throw new Error("No charge ID available on this PaymentIntent");
+    //       }
+    //       console.log("Charge ID to send to backend:", chargeId);
+
+    //       // (E) Create the “deposit” record in our system so we know action_id & action type
+    //       const { id: action_id, type: action } = await createDepositAction(amount);
+
+    //       // (F) Tell our backend “Stripe payment succeeded,” passing the Charge ID from step (D)
+    //       await confirmStripePaymentOnBackend(action_id, action, chargeId);
+
+    //       // If you need to show any success message client-side, do it here.
+    //     } catch (err) {
+    //       console.error("Top-up failed:", err);
+    //       throw err;
+    //     }
+    //   };
+
+
+
     const getDepositTransactions = async () => {
         const token = localStorage.getItem("token");
         if (!token) throw new Error("Not authenticated");
