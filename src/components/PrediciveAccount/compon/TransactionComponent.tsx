@@ -19,7 +19,7 @@ export const TransactionsComponent = () => {
     "all"
   );
 
-  const [transactions, setTransactions] = useState<
+  const [, setTransactions] = useState<
     {
       id: string;
       name: string;

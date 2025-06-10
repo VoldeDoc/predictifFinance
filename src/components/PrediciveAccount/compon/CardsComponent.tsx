@@ -111,7 +111,6 @@ export const CardsComponent = () => {
               maxHeight="300px"
               renderNameWithIcon={true}
               hideCategory={true}
-              hideType={true}
             />
           </div>
         </div>
