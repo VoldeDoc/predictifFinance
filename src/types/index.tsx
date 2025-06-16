@@ -5,7 +5,7 @@ export interface DailyLimitProps {
     currency?: string;
   }
 
-  export interface SavingPlanItem {
+  export interface BudgetPlanItem {
     id: string;
     name: string;
     target: number;
@@ -16,7 +16,7 @@ export interface DailyLimitProps {
 }
 
 
-export interface Savings {
+export interface Budgets {
     savings?: number;
     currency?: string;
 }

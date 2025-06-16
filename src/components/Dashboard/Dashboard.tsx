@@ -1,21 +1,18 @@
 import { useNavigate } from "react-router-dom";
 import { AuthLayout } from "../Layout/layout";
-// import FinancialOverview from "./Tools/FinancialOverview";
-// import PortfolioAnalyticsWatchList from "./Tools/PortfolioAnalyticsWatchList";
 import StockCardCarousel from "./Tools/StockCardCarousel";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import UseFinanceHook from "@/hooks/UseFinance";
-import { BanknotesIcon, CreditCardIcon, WalletIcon } from "@heroicons/react/24/solid"
+import {  BanknotesIcon, CreditCardIcon, WalletIcon } from "@heroicons/react/24/solid"
 import { Card } from "./Tools/card"
 import CreditCard from "./Tools/CreditCard"
 import CreditCardBtn from "./Tools/CreditCardBtn"
 import DailyLimit from "./Tools/DailyLimit"
-import SavingPlan from "./Tools/SavingsPlan"
+import SavingPlan from "./Tools/BudgetPlan"
 import CashFlow from "./Tools/Cashflow"
 import TransactionTable from "./Tools/TransactionTable"
 import PieChart from "./Tools/PieChart"
 import RecentActivity from "./Tools/RecentActivity"
-import AnalyticsSparkline from "./Tools/AnalyticsChart"
 
 interface Summary {
   income: number;
@@ -27,6 +24,10 @@ const Dashboard = () => {
   const { getUserDetails, getBudgetSummary } = UseFinanceHook();
   const router = useNavigate();
   const [showKycAlert, setShowKycAlert] = useState(false);
+  const [userDetails, setUserDetails] = useState<any>(null);
+
+  // Add ref for transaction table
+  const transactionTableRef = useRef<HTMLDivElement>(null);
 
   const [summary, setSummary] = useState<Summary>({ income: 0, expense: 0, budgetamount: 0 });
 
@@ -34,11 +35,22 @@ const Dashboard = () => {
   const [expensePct, setExpensePct] = useState(0);
   const [savingsPct, setSavingsPct] = useState(0);
 
+  // Function to scroll to transaction table
+  const scrollToTransactionTable = () => {
+    if (transactionTableRef.current) {
+      transactionTableRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    }
+  };
+
   useEffect(() => {
     const fetchUserDetails = async () => {
       try {
-        const userDetails = await getUserDetails();
-        const kycNotDone = userDetails?.data[0]?.kyc_status;
+        const userDetailsResponse = await getUserDetails();
+         setUserDetails(userDetailsResponse);
+        const kycNotDone = userDetailsResponse?.data[0]?.kyc_status;
         if (kycNotDone !== "yes") {
           setShowKycAlert(true);
         }
@@ -49,14 +61,33 @@ const Dashboard = () => {
     fetchUserDetails();
   }, []);
 
+  // Listen for hash changes to scroll to transaction table
+  useEffect(() => {
+    const handleHashChange = () => {
+      if (window.location.hash === '#history') {
+        setTimeout(() => {
+          scrollToTransactionTable();
+        }, 100); // Small delay to ensure DOM is ready
+      }
+    };
+
+    // Check on component mount
+    handleHashChange();
+
+    // Listen for hash changes
+    window.addEventListener('hashchange', handleHashChange);
+
+    return () => {
+      window.removeEventListener('hashchange', handleHashChange);
+    };
+  }, []);
+
   useEffect(() => {
     async function load() {
-      const data = await getBudgetSummary(); // { income, expense, budgetamount }
-      // pull last snapshot
+      const data = await getBudgetSummary();
       const lastRaw = localStorage.getItem("lastSummary");
       const last: Summary | null = lastRaw ? JSON.parse(lastRaw) : null;
 
-      // helper
       const pct = (newVal: number, oldVal?: number) =>
         oldVal && oldVal !== 0
           ? Math.round(((newVal - oldVal) / oldVal) * 1000) / 10
@@ -71,7 +102,6 @@ const Dashboard = () => {
     }
     load();
   }, [getBudgetSummary]);
-
 
   return (
     <AuthLayout>
@@ -111,22 +141,21 @@ const Dashboard = () => {
         )}
         <div className="container">
           <StockCardCarousel />
-          {/* <FinancialOverview />
-          <PortfolioAnalyticsWatchList /> */}
           <div className="px-4 sm:px-6">
             <div className="flex flex-col lg:flex-row gap-6">
               {/* First Column - 32% */}
               <div className="w-full lg:w-[32%]">
                 <div className="bg-white p-4 rounded-lg shadow-sm">
                   <CreditCard
-                    cardNumber="1234567890123456"
-                    cardholderName="John Doe"
-                    expiryDate="12/23"
-                    cvv="1234"
-                    cardType="VISA"
+                    cardNumber="****** **** ****"
+                    cardholderName={`${userDetails?.data[0]?.first_name || ''} ${userDetails?.data[0]?.last_name || ''}`.trim() || 'CARD HOLDER'}
+                    expiryDate="**/**"
+                    cvv="***"
+                    cardTypeImage="/assets/images/favicon.png"
                     size="sm"
                   />
-                  <CreditCardBtn />
+                  {/* Pass the scroll function to CreditCardBtn */}
+                  <CreditCardBtn onHistoryClick={scrollToTransactionTable} />
                 </div>
                 <div className="mt-6">
                   <DailyLimit />
@@ -162,28 +191,20 @@ const Dashboard = () => {
                   <CashFlow />
                 </div>
 
-                <TransactionTable
-                  initialPageSize={5}
-                  maxHeight="350px"
-                />
+                {/* Add ref to TransactionTable */}
+                <div ref={transactionTableRef} id="history">
+                  <TransactionTable
+                    initialPageSize={5}
+                    maxHeight="350px"
+                  />
+                </div>
               </div>
 
               {/* Third Column - 22% */}
               <div className="w-full lg:w-[22%]">
-                {/* Pie Chart with tabs */}
                 <PieChart />
-
                 <RecentActivity />
               </div>
-            </div>
-            <div className="px-4 md:px-6 lg:px-4">
-              <AnalyticsSparkline
-                title="Analytics"
-                maxY={50000}
-                lineColor="#3B82F6"
-                fillColor="#93C5FD"
-              />
-
             </div>
           </div>
         </div>

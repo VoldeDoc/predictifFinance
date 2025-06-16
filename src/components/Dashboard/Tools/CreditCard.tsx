@@ -6,7 +6,8 @@ interface CreditCardProps {
   cardholderName?: string;
   expiryDate?: string;
   cvv?: string;
-  cardType?: 'VISA' | 'MASTERCARD' | 'AMEX' | 'DISCOVER';
+  cardType?: 'VISA' | 'MASTERCARD' | 'AMEX' | 'DISCOVER' | string;
+  cardTypeImage?: string; // New prop for image URL
   size?: 'sm' | 'md' | 'lg';
   bgFrom?: string;
   bgTo?: string;
@@ -20,6 +21,7 @@ const CreditCard: React.FC<CreditCardProps> = ({
   expiryDate = 'MM/YY',
   cvv = '•••',
   cardType = 'VISA',
+  cardTypeImage, // New prop
   size = 'md',
   bgFrom = 'from-blue-500',
   bgTo = 'to-cyan-400',
@@ -51,6 +53,13 @@ const CreditCard: React.FC<CreditCardProps> = ({
   const labelSize = 'text-[10px]';
   const detailSize = size === 'sm' ? 'text-xs' : 'text-sm';
 
+  // Determine image size based on card size
+  const imageSize = {
+    'sm': 'h-6 w-auto',
+    'md': 'h-8 w-auto',
+    'lg': 'h-10 w-auto',
+  }[size];
+
   return (
     <div 
       className={`${sizeClasses} cursor-pointer ${styles.creditCardContainer} ${className}`}
@@ -63,7 +72,17 @@ const CreditCard: React.FC<CreditCardProps> = ({
           <div className={`flex flex-col justify-between h-full ${size === 'sm' ? 'p-3' : 'p-5'}`}>
             {/* Top section */}
             <div>
-              <div className={`text-right ${cardTypeSize} font-bold mb-2`}>{cardType}</div>
+              <div className={`text-right ${cardTypeSize} font-bold mb-2 flex justify-end items-center`}>
+                {cardTypeImage ? (
+                  <img 
+                    src={cardTypeImage} 
+                    alt={cardType} 
+                    className={`${imageSize} object-contain`}
+                  />
+                ) : (
+                  cardType
+                )}
+              </div>
               
               {/* Chip */}
               <div className={`${size === 'sm' ? 'w-8 h-6' : 'w-12 h-10'} bg-yellow-600 rounded-md mb-2 flex flex-col justify-evenly p-1`}>
@@ -113,7 +132,7 @@ const CreditCard: React.FC<CreditCardProps> = ({
             
             <div className="text-center text-[8px] mb-3">
               <p className="mb-1">This card is property of PredictifFinance.</p>
-              <p>If found, please return to the nearest branch.</p>
+              {/* <p>If found, please return to the nearest branch.</p> */}
             </div>
           </div>
         </div>

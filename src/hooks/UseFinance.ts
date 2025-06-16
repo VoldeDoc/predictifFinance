@@ -850,6 +850,24 @@ const UseFinanceHook = () => {
         }
     };
 
+    const getBudgetPlansId = async (id:string) => {
+        try {
+            const token = localStorage.getItem("token");
+            if (!token) throw new Error("Unauthorized");
+            setLoading(true);
+            const response = await client.get(`/user/budgetget/${id}`, {
+                headers: { Authorization: `Bearer ${JSON.parse(token)}` }
+            });
+            // response.data.data is the array of plans
+            return response.data.data;
+        } catch (err: any) {
+            console.error("Error fetching budget plans:", err);
+            return [];
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const createBudgetPlan = async (
         data: BudgetPlanPayload
     ): Promise<any> => {
@@ -857,15 +875,15 @@ const UseFinanceHook = () => {
             const token = localStorage.getItem("token");
             if (!token) throw new Error("Authentication required");
             setLoading(true);
-            const response = await client.post(
+            await client.post(
                 "/user/budgetCreate",
                 data,
                 { headers: { Authorization: `Bearer ${JSON.parse(token)}` } }
             );
-            return response.data.data;
+            return Promise.resolve("Budget plan created successfully");
         } catch (err: any) {
             console.error("Error creating budget plan:", err);
-            throw err;
+            return Promise.reject(err);
         } finally {
             setLoading(false);
         }
@@ -934,41 +952,87 @@ const UseFinanceHook = () => {
         }
     };
 
-    const getExpenseCategories = async (): Promise<{ category: string; total_amount: number }[]> => {
-        try {
-            const token = localStorage.getItem("token");
-            if (!token) throw new Error("Unauthorized");
-            setLoading(true);
-            const res = await client.get("/user/budgetsummaryExpense", {
-                headers: { Authorization: `Bearer ${JSON.parse(token)}` },
-            });
-            // API: { status, message, data: [ { category, total_amount } ] }
-            return res.data.data;
-        } catch (err: any) {
-            console.error("Error fetching expense categories", err);
-            return Promise.reject(err);
-        } finally {
-            setLoading(false);
-        }
-    };
+    // const getExpenseCategories = async (): Promise<{ category: string; total_amount: number }[]> => {
+    //     try {
+    //         const token = localStorage.getItem("token");
+    //         if (!token) throw new Error("Unauthorized");
+    //         setLoading(true);
+    //         const res = await client.get("/user/budgetsummaryExpense", {
+    //             headers: { Authorization: `Bearer ${JSON.parse(token)}` },
+    //         });
+    //         // API: { status, message, data: [ { category, total_amount } ] }
+    //         return res.data.data;
+    //     } catch (err: any) {
+    //         console.error("Error fetching expense categories", err);
+    //         return Promise.reject(err);
+    //     } finally {
+    //         setLoading(false);
+    //     }
+    // };
 
 
-    const getIncomeCategories = async (): Promise<{ category: string; total_amount: number }[]> => {
-        try {
-            const token = localStorage.getItem("token");
-            if (!token) throw new Error("Unauthorized");
-            setLoading(true);
-            const res = await client.get("/user/budgetsummaryIncome", {
-                headers: { Authorization: `Bearer ${JSON.parse(token)}` },
-            });
-            return res.data.data;
-        } catch (err: any) {
-            console.error("Error fetching income categories", err);
-            return Promise.reject(err);
-        } finally {
-            setLoading(false);
-        }
-    };
+    // const getIncomeCategories = async (): Promise<{ category: string; total_amount: number }[]> => {
+    //     try {
+    //         const token = localStorage.getItem("token");
+    //         if (!token) throw new Error("Unauthorized");
+    //         setLoading(true);
+    //         const res = await client.get("/user/budgetsummaryIncome", {
+    //             headers: { Authorization: `Bearer ${JSON.parse(token)}` },
+    //         });
+    //         return res.data.data;
+    //     } catch (err: any) {
+    //         console.error("Error fetching income categories", err);
+    //         return Promise.reject(err);
+    //     } finally {
+    //         setLoading(false);
+    //     }
+    // };
+
+    
+
+const getExpenseCategories = async (periodId?: string): Promise<{ category: string; total_amount: number }[]> => {
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) throw new Error("Unauthorized");
+    setLoading(true);
+    
+    const url = periodId 
+      ? `/user/budgetsummaryExpense?period_id=${periodId}`
+      : `/user/budgetsummaryExpense`;
+      
+    const res = await client.get(url, {
+      headers: { Authorization: `Bearer ${JSON.parse(token)}` }
+    });
+    return res.data.data;
+  } catch (err: any) {
+    console.error("Error fetching expense categories", err);
+    return [];
+  } finally {
+    setLoading(false);
+  }
+};
+
+const getIncomeCategories = async (periodId?: string): Promise<{ category: string; total_amount: number }[]> => {
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) throw new Error("Unauthorized");
+    setLoading(true);
+    
+    const url = periodId 
+      ? `/user/budgetsummaryIncome?period_id=${periodId}`
+      : `/user/budgetsummaryIncome`;
+      
+    const res = await client.get(url, {
+      headers: { Authorization: `Bearer ${JSON.parse(token)}` }
+    });
+    return res.data.data;
+  } catch (err: any) {
+    console.error("Error fetching income categories", err);
+    return [];
+  } finally {
+    setLoading(false);
+  }
+};
 
     const getBudgetPeriods = async () => {
         const token = localStorage.getItem("token");
@@ -1225,6 +1289,7 @@ const UseFinanceHook = () => {
         createDepositAction,
         topUp,
         getDepositTransactions,
+        getBudgetPlansId,
     }
 
 }

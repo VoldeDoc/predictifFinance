@@ -22,7 +22,7 @@ export const TransactionsComponent = () => {
   const [, setTransactions] = useState<
     {
       id: string;
-      name: string;
+    name: string;
       account?: string;
       date: string;
       time?: string;

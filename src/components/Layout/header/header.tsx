@@ -18,6 +18,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/context/store/rootReducer";
 import { CgPassword, CgProfile } from "react-icons/cg";
 import { PiStrategy } from "react-icons/pi";
+import { MdSavings } from "react-icons/md";
 
 type Props = {
   showNav: boolean;
@@ -27,6 +28,10 @@ type Props = {
 export const Header = ({ showNav, setShowNav }: Props) => {
   const userdata = useSelector((state: RootState) => state.auth?.user);
   const username = userdata?.username;
+
+  
+  const isKycComplete = (userdata as any)?.kyc_status === 'yes'  
+
   return (
     <section
       className={`fixed z-[9999] w-full h-24 bg-white flex items-center transition-all duration-[900ms] ${
@@ -58,9 +63,7 @@ export const Header = ({ showNav, setShowNav }: Props) => {
         </div>
 
         <li className="flex items-center gap-5 md:gap-8">
-        {/* <div className=" "> */}
           <SearchModal />
-        {/* </div> */}
           <Popover className={"relative"}>
             <Popover.Button
               className={"outline-none cursor-pointer text-gray-700"}
@@ -152,20 +155,23 @@ export const Header = ({ showNav, setShowNav }: Props) => {
                 }
               >
                 <div className="p-1">
-               
-                  <Menu.Item>
-                    <Link
-                      to={"/kyc"}
-                      className={
-                        "flex items-center gap-2 rounded p-2 transition-colors ease-in-out duration-150 text-gray-700 hover:bg-gray-100 group"
-                      }
-                    >
-                      <CreditCardIcon className={"h-4 w-4 text-gray-700"} />
-                      <span className={"group-hover:text-orange-500"}>
-                        kyc
-                      </span>
-                    </Link>
-                  </Menu.Item>
+                  {/* Conditionally render KYC link only if KYC is not complete */}
+                  {!isKycComplete && (
+                    <Menu.Item>
+                      <Link
+                        to={"/kyc"}
+                        className={
+                          "flex items-center gap-2 rounded p-2 transition-colors ease-in-out duration-150 text-gray-700 hover:bg-gray-100 group"
+                        }
+                      >
+                        <CreditCardIcon className={"h-4 w-4 text-gray-700"} />
+                        <span className={"group-hover:text-orange-500"}>
+                          Complete KYC
+                        </span>
+                      </Link>
+                    </Menu.Item>
+                  )}
+                  
                   <Menu.Item>
                     <Link
                       to={"/strategies"}
@@ -176,6 +182,19 @@ export const Header = ({ showNav, setShowNav }: Props) => {
                       <PiStrategy className={"h-4 w-4 text-gray-700"} />
                       <span className={"group-hover:text-orange-500"}>
                         Strategies
+                      </span>
+                    </Link>
+                  </Menu.Item>
+                  <Menu.Item>
+                    <Link
+                      to={"/user-budgets"}
+                      className={
+                        "flex items-center gap-2 rounded p-2 transition-colors ease-in-out duration-150 text-gray-700 hover:bg-gray-100 group"
+                      }
+                    >
+                      <MdSavings className={"h-4 w-4 text-gray-700"} />
+                      <span className={"group-hover:text-orange-500"}>
+                        Budget
                       </span>
                     </Link>
                   </Menu.Item>

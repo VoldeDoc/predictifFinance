@@ -1,7 +1,7 @@
 import { BiTrendingUp } from "react-icons/bi";
 import { AuthLayout } from "../Layout/layout";
 import { PiChatCenteredTextLight } from "react-icons/pi";
-import SavingPlan from "../Dashboard/Tools/SavingsPlan";
+import SavingPlan from "../Dashboard/Tools/BudgetPlan";
 import { PiAirplaneTiltThin } from "react-icons/pi";
 import TransactionsComponent from "../PrediciveAccount/compon/TransactionComponent";
 import BalanceChart from "./Component/BalanceChart";

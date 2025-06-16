@@ -49,6 +49,12 @@ import Strategies from "./components/Strategy/strategies";
 import Profile from "./components/Profile/profile";
 import ForgetPwdOtpVerification from "./components/Auth/ForgetPwdOtpVerification";
 import TopUpForm from "./components/Dashboard/Tools/TopUpForm";
+import BudgetPlans from "./components/Budget/Budget";
+import BudgetSummary from "./components/Dashboard/BudgetSummary";
+import EditBudget from "./components/Budget/EditBudget";
+import AddBudget from "./components/Budget/AddBudget";
+import AddExpense from "./components/Expense/AddExpense";
+import AddIncome from "./components/Expense/AddIncome";
 
 
 function App() {
@@ -116,10 +122,10 @@ function App() {
               <Route path="/forum" element={<ProtectedRoute><Forum /></ProtectedRoute>} />
 
               <Route path="/forum/messages/:id" element={<ProtectedRoute><MessageBox /></ProtectedRoute>} />
-              
+
               <Route path="/groups" element={<ProtectedRoute><ForumGroup /></ProtectedRoute>} />
               <Route path="/create-group" element={<ProtectedRoute><CreateGroupPage /></ProtectedRoute>} />
-                 <Route path="/user/user-group/:id" element={<ProtectedRoute><UserGroupPage /></ProtectedRoute>} />
+              <Route path="/user/user-group/:id" element={<ProtectedRoute><UserGroupPage /></ProtectedRoute>} />
 
               <Route path="/user/settings/:id" element=
                 {<ProtectedRoute><GroupSettingsPage /></ProtectedRoute>} />
@@ -130,6 +136,14 @@ function App() {
               <Route path="/user/all-users/:id" element={<ProtectedRoute><AllUsersPage /></ProtectedRoute>} />
               <Route path="/user/remove-users/:id" element={<ProtectedRoute><RemoveMember /></ProtectedRoute>} />
 
+              <Route path="/user-budgets" element={<ProtectedRoute><BudgetPlans /></ProtectedRoute>} />
+              <Route path="/budget-summary" element={<ProtectedRoute><BudgetSummary /></ProtectedRoute>} />
+              <Route path="/add-budget" element={<ProtectedRoute><AddBudget /></ProtectedRoute>} />
+              <Route path="/edit-budget/:id" element={<ProtectedRoute><EditBudget /></ProtectedRoute>} />
+
+          {/* Expense and Income */}
+           <Route path="/add-expense" element={<ProtectedRoute><AddExpense /></ProtectedRoute>} />
+           <Route path="/add-income" element={<ProtectedRoute><AddIncome /></ProtectedRoute>} />
 
               {/* Ui */}
               <Route path="/ui/button" element={<ButtonT />} />
