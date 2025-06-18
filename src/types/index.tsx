@@ -173,3 +173,15 @@ export interface updateStreategyValues{
 }
 
 
+export interface SavingValues{
+  label:string;
+  target_amount:number;
+  description:string;
+}
+
+export interface SavingDepostitValues{
+  reference:string;
+  amount:number;
+  detail:string;
+}
+

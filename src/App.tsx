@@ -55,6 +55,9 @@ import EditBudget from "./components/Budget/EditBudget";
 import AddBudget from "./components/Budget/AddBudget";
 import AddExpense from "./components/Expense/AddExpense";
 import AddIncome from "./components/Expense/AddIncome";
+import ReceiptPage from "./components/Dashboard/Tools/Receipt";
+import AllSavingsPage from "./components/PrediciveAccount/compon/AllSavings/AllSavings";
+import AllAccountsPage from "./components/PrediciveAccount/compon/AllAccountPage";
 
 
 function App() {
@@ -144,6 +147,9 @@ function App() {
           {/* Expense and Income */}
            <Route path="/add-expense" element={<ProtectedRoute><AddExpense /></ProtectedRoute>} />
            <Route path="/add-income" element={<ProtectedRoute><AddIncome /></ProtectedRoute>} />
+           <Route path="/receipt" element={<ProtectedRoute><ReceiptPage /></ProtectedRoute>} />
+           <Route path="/all-savings" element={<ProtectedRoute><AllSavingsPage /></ProtectedRoute>} />
+           <Route path="/accounts/all" element={<ProtectedRoute><AllAccountsPage /></ProtectedRoute>} />
 
               {/* Ui */}
               <Route path="/ui/button" element={<ButtonT />} />

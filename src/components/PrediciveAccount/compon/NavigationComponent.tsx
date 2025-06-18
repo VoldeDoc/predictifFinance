@@ -45,9 +45,9 @@ const Navigation: React.FC<NavigationProps> = ({
       section: 'main'
     },
     {
-      name: "Send",
+      name: "Savings",
       icon: <ArrowsRightLeftIcon className="w-5 h-5" />,
-      id: "send",
+      id: "savings",
       section: 'main'
     },
     {
@@ -57,9 +57,9 @@ const Navigation: React.FC<NavigationProps> = ({
       section: 'main'
     },
     {
-      name: "Cards",
+      name: "Funds & Deposit",
       icon: <CreditCardIcon className="w-5 h-5" />,
-      id: "cards",
+      id: "funds",
       section: 'main'
     },
     {
@@ -167,7 +167,7 @@ const Navigation: React.FC<NavigationProps> = ({
       <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 shadow-lg">
         <div className="flex justify-around">
           {/* Show only first 3 main items to make room for settings and theme toggle */}
-          {mainItems.slice(0, 3).map((item) => (
+          {mainItems.slice(0, 4).map((item) => (
             <button
               key={item.id}
               className={`flex flex-col items-center justify-center py-2 px-1 flex-1 ${
@@ -195,7 +195,7 @@ const Navigation: React.FC<NavigationProps> = ({
           ))}
           
           {/* Light/Dark mode toggle */}
-          <button
+          {/* <button
             className="flex flex-col items-center justify-center py-2 px-1 flex-1 text-gray-500"
             onClick={toggleDarkMode}
           >
@@ -203,7 +203,7 @@ const Navigation: React.FC<NavigationProps> = ({
               {darkMode ? <SunIcon className="w-5 h-5" /> : <MoonIcon className="w-5 h-5" />}
             </span>
             <span className="text-xs truncate">{darkMode ? "Light" : "Dark"}</span>
-          </button>
+          </button> */}
         </div>
       </div>
     </>

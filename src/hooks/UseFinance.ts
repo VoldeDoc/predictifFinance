@@ -1,13 +1,12 @@
 import axiosClient from "@/services/axios-client";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { addMembersValues, AssignMemberRoleValues, createGroupValues, createStrategyValues, deleteMessageValues, editMessageValues, KycData, sendMessageValues, SurveyDataValues, } from "@/types";
+import { addMembersValues, AssignMemberRoleValues, createGroupValues, createStrategyValues, deleteMessageValues, editMessageValues, KycData, SavingDepostitValues, SavingValues, sendMessageValues, SurveyDataValues, } from "@/types";
 import { toast } from "react-toastify";
 import { RootState } from "@/context/store/rootReducer";
 import { useSelector } from "react-redux";
 import axios from "axios";
 import type { Stripe, StripeCardElement } from "@stripe/stripe-js";
-
 export interface BudgetPlanPayload {
     label: string;
     budget_amount: string;
@@ -33,33 +32,53 @@ const UseFinanceHook = () => {
 
     const username = userdata?.username;
 
-    const SubmitSurveyQuestion = async (data: SurveyDataValues) => {
-        try {
-            const token = localStorage.getItem("token");
-            if (!token) {
-                router("/auth/signup");
-                return Promise.reject("Authentication required to change password");
-            }
-            setLoading(true);
-            const response = await client.post("/user/investQuestionnaire", data, {
-                headers: {
-                    Authorization: `Bearer ${JSON.parse(token)}`
-                }
-            })
-            console.log(response.data);
-            router("/dashboard");
-            return Promise.resolve("Survey submitted successfully");
-        }
-        catch (error: any) {
-            const resError = error.response?.data;
-            const errorMessage = resError?.message || resError?.data;
-            console.log(errorMessage);
-            return Promise.reject(errorMessage || "Failed to submit survey");
-        }
-        finally {
-            setLoading(false);
-        }
+
+const SubmitSurveyQuestion = async (data: SurveyDataValues) => {
+  try {
+    // Get token from Redux store or localStorage
+    const reduxToken = useSelector((state: RootState) => state.auth.token);
+    const token = reduxToken || localStorage.getItem("token") || sessionStorage.getItem("token");
+    
+    if (!token) {
+      toast.error("Authentication required. Please log in.");
+      router("/auth/signin");
+      return Promise.reject("Authentication required");
     }
+
+    setLoading(true);
+    
+    // Parse token if it's stored as JSON string
+    const parsedToken = typeof token === 'string' && token.startsWith('"') ? JSON.parse(token) : token;
+    
+    const response = await client.post("/user/investQuestionnaire", data, {
+      headers: {
+        Authorization: `Bearer ${parsedToken}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    console.log("Survey response:", response.data);
+    
+    return Promise.resolve(response.data?.message || "Survey submitted successfully");
+    
+  } catch (error: any) {
+    const resError = error.response?.data;
+    const errorMessage = resError?.message || resError?.data || "Failed to submit survey";
+    console.error("Survey submission error:", errorMessage);
+    
+    // Handle 401 errors
+    if (error.response?.status === 401) {
+      localStorage.removeItem("token");
+      sessionStorage.removeItem("token");
+      router("/auth/signin");
+      return Promise.reject("Session expired. Please log in again.");
+    }
+    
+    return Promise.reject(errorMessage);
+  } finally {
+    setLoading(false);
+  }
+};
 
     const getUserDetails = async () => {
         try {
@@ -1012,6 +1031,26 @@ const getExpenseCategories = async (periodId?: string): Promise<{ category: stri
   }
 };
 
+const getExpenseCaCat = async (): Promise<{ category: string; total_amount: number }[]> => {
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) throw new Error("Unauthorized");
+    setLoading(true);
+    
+    const url =  `/user/budgetsummaryExpense`;
+      
+    const res = await client.get(url, {
+      headers: { Authorization: `Bearer ${JSON.parse(token)}` }
+    });
+    return res.data.data;
+  } catch (err: any) {
+    console.error("Error fetching expense categories", err);
+    return [];
+  } finally {
+    setLoading(false);
+  }
+};
+
 const getIncomeCategories = async (periodId?: string): Promise<{ category: string; total_amount: number }[]> => {
   try {
     const token = localStorage.getItem("token");
@@ -1021,6 +1060,26 @@ const getIncomeCategories = async (periodId?: string): Promise<{ category: strin
     const url = periodId 
       ? `/user/budgetsummaryIncome?period_id=${periodId}`
       : `/user/budgetsummaryIncome`;
+      
+    const res = await client.get(url, {
+      headers: { Authorization: `Bearer ${JSON.parse(token)}` }
+    });
+    return res.data.data;
+  } catch (err: any) {
+    console.error("Error fetching income categories", err);
+    return [];
+  } finally {
+    setLoading(false);
+  }
+};
+
+const getIncomeCat = async (): Promise<{ category: string; total_amount: number }[]> => {
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) throw new Error("Unauthorized");
+    setLoading(true);
+    
+    const url = `/user/budgetsummaryIncome`;
       
     const res = await client.get(url, {
       headers: { Authorization: `Bearer ${JSON.parse(token)}` }
@@ -1240,6 +1299,115 @@ const getIncomeCategories = async (periodId?: string): Promise<{ category: strin
         }>;
     };
 
+    const createSavings = async (data :SavingValues)=>{
+       try {
+            const token = localStorage.getItem("token");
+            if (!token) {
+                router("/auth/signup");
+                return Promise.reject("Authentication required to create savings");
+            }
+
+            setLoading(true);
+            const savings = await client.post("/user/savingsCreate", data, {
+                headers: {
+                    Authorization: `Bearer ${JSON.parse(token)}`
+                }
+            });
+            const result = savings.data.data;
+            console.log(result);
+            return Promise.resolve("Savings created successfully!");
+        } catch (error: any) {
+            const resError = error.response?.data;
+            const errorMessage =
+                resError?.message || resError?.data;
+            console.log(errorMessage);
+            return Promise.reject(`${errorMessage}`);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const createSavingsFundDeposit = async (data :SavingDepostitValues)=>{
+       try {
+            const token = localStorage.getItem("token");
+            if (!token) {
+                router("/auth/signup");
+                return Promise.reject("Authentication required to create savings");
+            }
+
+            setLoading(true);
+            const savings = await client.post("/user/savefund", data, {
+                headers: {
+                    Authorization: `Bearer ${JSON.parse(token)}`
+                }
+            });
+            const result = savings.data.data;
+            console.log(result);
+            return Promise.resolve("Savings created successfully!");
+        } catch (error: any) {
+            const resError = error.response?.data;
+            const errorMessage =
+                resError?.message || resError?.data;
+            console.log(errorMessage);
+            return Promise.reject(`${errorMessage}`);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+  
+    const getAllWallets =  async()=>{
+         try {
+            const token = localStorage.getItem("token");
+            if (!token) throw new Error("Unauthorized");
+            setLoading(true);
+            const response = await client.get('/user/wallet', {
+                headers: { Authorization: `Bearer ${JSON.parse(token)}` }
+            });
+            return response.data;
+        } catch (err: any) {
+            console.error("Error fetching budget plans:", err);
+            return [];
+        } finally {
+            setLoading(false);
+        }
+    };
+  
+    const getSavingWallets =  async()=>{
+         try {
+            const token = localStorage.getItem("token");
+            if (!token) throw new Error("Unauthorized");
+            setLoading(true);
+            const response = await client.get('/user/walletSavings', {
+                headers: { Authorization: `Bearer ${JSON.parse(token)}` }
+            });
+            return response.data;
+        } catch (err: any) {
+            console.error("Error fetching budget plans:", err);
+            return [];
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const getSavedFundByReferenceId =  async(refId:number)=>{
+         try {
+            const token = localStorage.getItem("token");
+            if (!token) throw new Error("Unauthorized");
+            setLoading(true);
+            const response = await client.get(`/user/walletSavingsTransact/${refId}`, {
+                headers: { Authorization: `Bearer ${JSON.parse(token)}` }
+            });
+            return response.data;
+        } catch (err: any) {
+            console.error("Error fetching budget plans:", err);
+            return [];
+        } finally {
+            setLoading(false);
+        }
+    };
+
+
 
     return {
         loading,
@@ -1290,6 +1458,13 @@ const getIncomeCategories = async (periodId?: string): Promise<{ category: strin
         topUp,
         getDepositTransactions,
         getBudgetPlansId,
+        createSavings,
+        getAllWallets,
+        getSavingWallets,
+        createSavingsFundDeposit,
+        getSavedFundByReferenceId,
+        getIncomeCat,
+        getExpenseCaCat,
     }
 
 }

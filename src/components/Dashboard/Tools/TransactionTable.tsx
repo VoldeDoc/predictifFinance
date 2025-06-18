@@ -1,4 +1,3 @@
-// src/components/Dashboard/Tools/TransactionTable.tsx
 import { useState, useEffect, ReactNode } from "react";
 import {
   MagnifyingGlassIcon,
@@ -17,9 +16,9 @@ interface Transaction {
   date: string;         // YYYY-MM-DD
   time?: string;        // HH:MM:SS
   amount: number;
-  description?: string; // raw.detail or “—”
+  description?: string; // raw.detail or "—"
   status: "completed" | "pending" | "failed";
-  category?: string;    // e.g. “Deposit”
+  category?: string;    // e.g. "Deposit"
   type: "income" | "expense";
 }
 
@@ -33,8 +32,7 @@ interface TransactionTableProps {
   showTitle?: boolean;
   initialPageSize?: number;
   maxHeight?: string;
-  // we no longer pass customData; this component fetches its own deposit history.
-  // customHeaders?: TableHeader[];
+  data?: Transaction[]; // Add this back to accept external data
   renderNameWithIcon?: boolean;
   hideCategory?: boolean;
 }
@@ -44,8 +42,7 @@ export default function TransactionTable({
   showTitle = true,
   initialPageSize = 5,
   maxHeight = "350px",
-  // customData,
-  // customHeaders,
+  data, // Accept external data
   renderNameWithIcon = false,
   hideCategory = false,
 }: TransactionTableProps) {
@@ -73,10 +70,18 @@ export default function TransactionTable({
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [accountFilter, setAccountFilter] = useState<string>("all");
 
-  // 3) Load deposit history on mount
+  // 3) Load deposit history on mount OR use external data
   const { getDepositTransactions } = UseFinanceHook();
   
   useEffect(() => {
+    // If external data is provided, use it
+    if (data) {
+      setTransactions(data);
+      setFilteredTransactions(data);
+      return;
+    }
+
+    // Otherwise, fetch deposit history
     const fetchHistory = async () => {
       try {
         const raw = await getDepositTransactions();
@@ -95,7 +100,7 @@ export default function TransactionTable({
             description: r.detail ?? "",
             status: (r.status as "completed" | "pending" | "failed"),
             category: "Deposit",
-            type: "income",               // treat deposit as “income”
+            type: "income",               // treat deposit as "income"
           };
         });
         setTransactions(mapped);
@@ -107,9 +112,17 @@ export default function TransactionTable({
       }
     };
     fetchHistory();
-  }, []);
+  }, [data]); // Add data as dependency
 
-  // 4) Derive unique “accounts” for the filter dropdown
+  // Update transactions when external data changes
+  useEffect(() => {
+    if (data) {
+      setTransactions(data);
+      setFilteredTransactions(data);
+    }
+  }, [data]);
+
+  // 4) Derive unique "accounts" for the filter dropdown
   const accounts = Array.from(
     new Set(transactions.filter((tx) => tx.account).map((tx) => tx.account!))
   );
@@ -167,6 +180,10 @@ export default function TransactionTable({
         return sortDirection === "asc"
           ? a.account.localeCompare(b.account)
           : b.account.localeCompare(a.account);
+      } else if (sortKey === "category" && a.category && b.category) {
+        return sortDirection === "asc"
+          ? a.category.localeCompare(b.category)
+          : b.category.localeCompare(a.category);
       }
       return 0;
     });
@@ -349,6 +366,9 @@ export default function TransactionTable({
                               )}
                               <div>
                                 <p className="font-medium">{tx.name}</p>
+                                {tx.description && tx.description !== tx.name && (
+                                  <p className="text-xs text-gray-500">{tx.description}</p>
+                                )}
                               </div>
                             </div>
                           </td>

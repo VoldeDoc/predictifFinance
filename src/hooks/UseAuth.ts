@@ -32,27 +32,38 @@ const UserAuthentication = () => {
     }
 
 
-    const VerifyOtp = async (data: { email: string, otp: string }) => {
-        try {
-            setLoading(true);
-            const response = await client.post("/verifyOtp", {
-                email: data.email,
-                otp: data.otp
-            });
-            if (response.data.token) {
-                dispatch(setToken(response.data.token));
-                dispatch(setUser(response.data.user));
-            }
-            return response.data;
-        } catch (error: any) {
-            const resError = error.response?.data;
-            const errorMessage = resError?.message || resError?.data;
-            console.log(errorMessage);
-            return Promise.reject(errorMessage || "Failed to verify OTP");
-        } finally {
-            setLoading(false);
-        }
+   const VerifyOtp = async (data: { email: string, otp: string }) => {
+  try {
+    setLoading(true);
+    const response = await client.post("/verifyOtp", {
+      email: data.email,
+      otp: data.otp
+    });
+    
+    console.log("VerifyOtp API Response:", response.data); // Debug log
+    
+    // Store token and user in Redux if available
+    if (response.data.token) {
+      dispatch(setToken(response.data.token));
+      // Also store in localStorage as backup
+      localStorage.setItem("token", JSON.stringify(response.data.token));
     }
+    
+    if (response.data.user) {
+      dispatch(setUser(response.data.user));
+      localStorage.setItem("user", JSON.stringify(response.data.user));
+    }
+    
+    return response.data;
+  } catch (error: any) {
+    const resError = error.response?.data;
+    const errorMessage = resError?.message || resError?.data || "Failed to verify OTP";
+    console.error("VerifyOtp Error:", errorMessage);
+    throw new Error(errorMessage);
+  } finally {
+    setLoading(false);
+  }
+};
 
     const ResendOtp = async (email: string, action: string) => {
         try {

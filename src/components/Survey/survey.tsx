@@ -1,4 +1,4 @@
-import {  useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -9,27 +9,57 @@ import UseFinanceHook from "@/hooks/UseFinance";
 import { questionnaire } from "./questions";
 import Question from "./questionStructure";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { RootState } from "@/context/store/rootReducer";
 
 export default function Survey() {
   const [currentStep, setCurrentStep] = useState(0);
-  const { SubmitSurveyQuestion, loading,getUserDetails } = UseFinanceHook();
-const router = useNavigate()
-useEffect(() => {
-  const fetchUserDetails = async () => {
-    try {
-      const userDetails = await getUserDetails();
-      const isSurveyFilled = userDetails?.data[0]?.is_questionnaire_filled;
-        if (isSurveyFilled === "yes") {
-            toast.error("You have already filled out the questionnaire.");
-            router("/dashboard");
+  const { SubmitSurveyQuestion, loading, getUserDetails } = UseFinanceHook();
+  const router = useNavigate()
+  const token = useSelector((state: RootState) => state.auth.token);
+  const user = useSelector((state: RootState) => state.auth.user);
+  
+  useEffect(() => {
+    const fetchUserDetails = async () => {
+
+      try {
+        // Check token from Redux first, then localStorage as fallback
+        const authToken = token || localStorage.getItem("token");
+
+        if (!authToken) {
+          toast.error("Please complete the login process first.");
+          router("/auth/signin");
+          return;
         }
-    } catch (error) {
-      console.error("Error fetching user details:", error);
-    }
-  }
+
+        // Log for debugging
+        console.log("Token available:", !!authToken);
+        console.log("User available:", !!user);
+
+        const userDetails = await getUserDetails();
+        console.log("User details:", userDetails);
+
+        // Check if survey is already filled
+        const isSurveyFilled = userDetails?.data?.[0]?.is_questionnaire_filled;
+        if (isSurveyFilled === "yes") {
+          toast.info("You have already completed the questionnaire.");
+          router("/dashboard");
+        }
+      } catch (error: any) {
+        console.error("Error fetching user details:", error);
+
+        // Handle authentication errors
+        if (error?.response?.status === 401 || error?.message?.includes("unauthorized")) {
+          toast.error("Session expired. Please log in again.");
+          localStorage.removeItem("token");
+          sessionStorage.removeItem("token");
+          router("/auth/signin");
+        }
+      }
+    };
+
     fetchUserDetails();
-}
-, []);
+  }, [token, user, getUserDetails, router]);
 
 
   const handlePreviousClick = () => {
@@ -45,8 +75,8 @@ useEffect(() => {
     occupation: yup.string().required("Occupation is required"),
     long_investing: yup.string().required("Investment duration is required"),
     often_review_invest_portolio: yup.string().required("Portfolio review frequency is required"),
-    type_fin_assets: yup.array().of(yup.string().required()).min(1,"At least one option must be selected").required("Field is required"),
-    
+    type_fin_assets: yup.array().of(yup.string().required()).min(1, "At least one option must be selected").required("Field is required"),
+
     portCompPer_stock: yup.string().required("Stock percentage is required"),
     portCompPer_bond: yup.string().required("Bond percentage is required"),
     portCompPer_mutEtf: yup.string().required("Mutual funds/ETF percentage is required"),
@@ -55,31 +85,31 @@ useEffect(() => {
     portCompPer_cash: yup.string().required("Cash percentage is required"),
     portCompper_other_name: yup.string(),
     portCompper_other_per: yup.string().required("Field is required"),
-    
+
     pri_investment_goal: yup.string().required("Investment goal is required"),
     risk_tolerance: yup.string().required("Risk tolerance is required"),
-    believe_ai:yup.array().of(yup.string().required()).min(1,"At least one option must be selected").required("Field is required"),
+    believe_ai: yup.array().of(yup.string().required()).min(1, "At least one option must be selected").required("Field is required"),
     market_down: yup.string().required("Market reaction is required"),
-    insestment_strategy: yup.array().of(yup.string().required()).min(1,"At least one option must be selected").required("Field is required"),
+    insestment_strategy: yup.array().of(yup.string().required()).min(1, "At least one option must be selected").required("Field is required"),
     follow_investment_advice: yup.string().required("Investment advice is required"),
     do_advisor: yup.string().required("Financial advisor info is required"),
     invest_budget: yup.string().required("Investment budget is required"),
     diverser_investment: yup.string().required("Diversification importance is required"),
-    
+
     aitool_decision: yup.string().required("AI tool usage is required"),
-    ai_benefit: yup.array().of(yup.string().required()).min(1,"At least one option must be selected").required("Field is required"),
-    ai_aspect: yup.array().of(yup.string().required()).min(1,"At least one option must be selected").required("Field is required"),
+    ai_benefit: yup.array().of(yup.string().required()).min(1, "At least one option must be selected").required("Field is required"),
+    ai_aspect: yup.array().of(yup.string().required()).min(1, "At least one option must be selected").required("Field is required"),
     ai_comfortable_using: yup.string().required("AI comfort level is required"),
-    
+
     consider_event_current: yup.string().required("Field is required"),
-    belief_event_current_affect: yup.array().of(yup.string().required()).min(1,"At least one option must be selected").required("Field is required"),
-    
+    belief_event_current_affect: yup.array().of(yup.string().required()).min(1, "At least one option must be selected").required("Field is required"),
+
     role_researcher_invest: yup.string().required("Research role is required"),
     challenges_invest: yup.string().required("Investment challenges are required"),
     improvement_platform: yup.string().required("Platform improvements are required"),
     concerns_ai_invest: yup.string().required("AI concerns are required"),
     see_ai_invest_years: yup.string().required("Future AI role is required"),
-    
+
     additional_comment_ai: yup.string().required("Field is required"),
     additional_comment_preference: yup.string().required("Preference comments are required"),
   });
@@ -93,12 +123,12 @@ useEffect(() => {
     resolver: yupResolver(schema),
     mode: "all",
     defaultValues: {
-     type_fin_assets: [],
-     believe_ai: [],
-     insestment_strategy: [],
-     ai_benefit: [],
-     ai_aspect: [],
-    belief_event_current_affect: [],
+      type_fin_assets: [],
+      believe_ai: [],
+      insestment_strategy: [],
+      ai_benefit: [],
+      ai_aspect: [],
+      belief_event_current_affect: [],
     },
   });
 
@@ -106,14 +136,14 @@ useEffect(() => {
     const currentStepFields = questionnaire[currentStep].questions.map(
       (question) => question.id.toString() as keyof SurveyDataValues
     );
-  
+
     const isValid = await trigger(currentStepFields);
-  
+
     if (isValid) {
       setCurrentStep((prevStep) => Math.min(prevStep + 1, questionnaire.length - 1));
     }
   };
-  
+
   const onSubmitSurvey: SubmitHandler<SurveyDataValues> = async (data) => {
     toast.promise(SubmitSurveyQuestion(data), {
       pending: "Submitting...",

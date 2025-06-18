@@ -9,7 +9,7 @@ import { setToken, setUser } from "./store";
 import UserAuthentication from "@/hooks/UseAuth";
 
 const OtpVerification = () => {
-  const { ResendOtp, VerifyOtp } = UserAuthentication()
+  const { ResendOtp, VerifyOtp, loading } = UserAuthentication();
   const dispatch = useDispatch<AppDispatch>();
   const router = useNavigate();
   const [otp, setOtp] = useState(["", "", "", ""]);
@@ -22,7 +22,13 @@ const OtpVerification = () => {
   const containerRef = useRef<HTMLDivElement>(null);
 
   const email = location.state?.email;
- 
+
+  useEffect(() => {
+    if (!email) {
+      toast.error("Email is required. Please signup again.");
+      router("/auth/signup");
+    }
+  }, [email, router]);
 
   useEffect(() => {
     if (timeLeft > 0) {
@@ -111,43 +117,98 @@ const OtpVerification = () => {
 
     try {
       const response = await VerifyOtp({ email: email, otp: enteredOtp });
-      const token = response.data.token;
-      const user = response.data.user;
-      setIsInvalid(false);
-      dispatch(setToken(token));
-      dispatch(setUser(user));
-      router("/survey");
-      toast.success("OTP verified successfully! Fill Survey to continue");
-    } catch (error: any) {
-      if (error.response?.data?.message) {
-        toast.error(error.response?.data?.message);
+      
+      // Log the response to debug
+      console.log("OTP Verification Response:", response);
+      
+      // Check if we have token and user data
+      if (response?.data?.token && response?.data?.user) {
+        const token = response.data.token;
+        const user = response.data.user;
+        
+        // Store in Redux
+        dispatch(setToken(token));
+        dispatch(setUser(user));
+        
+        // Also store in localStorage as backup (for the survey component)
+        localStorage.setItem("token", JSON.stringify(token));
+        localStorage.setItem("user", JSON.stringify(user));
+        
+        setIsInvalid(false);
+        
+        toast.success("OTP verified successfully! Fill Survey to continue");
+        
+        // Add a small delay to ensure state is updated
+        setTimeout(() => {
+          router("/survey");
+        }, 500);
+        
+      } else if (response?.token && response?.user) {
+        // Handle case where token is directly in response
+        const token = response.token;
+        const user = response.user;
+        
+        dispatch(setToken(token));
+        dispatch(setUser(user));
+        
+        localStorage.setItem("token", JSON.stringify(token));
+        localStorage.setItem("user", JSON.stringify(user));
+        
+        setIsInvalid(false);
+        toast.success("OTP verified successfully! Fill Survey to continue");
+        
+        setTimeout(() => {
+          router("/survey");
+        }, 500);
+        
       } else {
-        toast.error("An unexpected error occurred. Please try again.");
+        // Handle case where verification is successful but no token returned
+        console.warn("OTP verified but no token received:", response);
+        toast.success("OTP verified successfully! Please login to continue.");
+        router("/auth/signin");
       }
+      
+    } catch (error: any) {
+      console.error("OTP Verification Error:", error);
+      
+      // More specific error handling
+      if (error?.response?.data?.message) {
+        toast.error(error.response.data.message);
+      } else if (error?.response?.data?.data) {
+        toast.error(error.response.data.data);
+      } else if (error?.message) {
+        toast.error(error.message);
+      } else {
+        toast.error("OTP verification failed. Please try again.");
+      }
+      
       // Clear OTP inputs and show the invalid animation
       handleError();
     }
   };
-const handleResend = async () => {
-  if (canResend) {
-    if (!email) {
-      toast.error("Email is not provided. Please try again.");
-      return;
-    }
-    try {
-      await ResendOtp(email, "register");
-      toast.success(`OTP resent successfully`);
-      setTimeLeft(120); // Reset to 2 minutes after resend
-      setCanResend(false);
-    } catch (error: any) {
-      if (error.response?.data?.data) {
-        toast.error(error.response?.data?.data);
-      } else {
-        toast.error("An unexpected error occurred. Please try again.");
+
+  const handleResend = async () => {
+    if (canResend) {
+      if (!email) {
+        toast.error("Email is not provided. Please try again.");
+        return;
+      }
+      try {
+        await ResendOtp(email, "register");
+        toast.success(`OTP resent successfully`);
+        setTimeLeft(120); // Reset to 2 minutes after resend
+        setCanResend(false);
+      } catch (error: any) {
+        if (error.response?.data?.data) {
+          toast.error(error.response?.data?.data);
+        } else if (error.response?.data?.message) {
+          toast.error(error.response?.data?.message);
+        } else {
+          toast.error("Failed to resend OTP. Please try again.");
+        }
       }
     }
-  }
-};
+  };
 
   const handleError = () => {
     setIsInvalid(true);
@@ -196,7 +257,7 @@ const handleResend = async () => {
         <div className="space-y-3 pt-[20%]">
           <h1 className="font-bold text-4xl">OTP Verification</h1>
           <h1 className="font-medium text-gray-500 text-base">
-            We sent a code to your email address.
+            We sent a code to {email ? <span className="font-semibold">{email}</span> : "your email address"}.
           </h1>
         </div>
 
@@ -228,17 +289,18 @@ const handleResend = async () => {
           <button
             onClick={handleResend}
             className={`font-bold ${canResend ? "text-primary hover:underline" : "text-gray-500 cursor-not-allowed"}`}
-            disabled={!canResend}
+            disabled={!canResend || loading}
           >
-            Resend
+            {loading ? "Sending..." : "Resend"}
           </button>
         </div>
         <div className="w-full md:mt-auto mt-10 md:mb-[10%]">
           <Button
             className="flex items-center py-3 w-full justify-center mx-auto rounded-md"
             text="Continue"
-            isLoading={false}
+            isLoading={loading}
             onClick={handleSubmit}
+            disabled={otp.join("").length !== 4}
           />
         </div>
       </div>

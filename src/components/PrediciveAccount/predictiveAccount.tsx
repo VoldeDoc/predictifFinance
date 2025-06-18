@@ -6,9 +6,9 @@ import {
 import { AccountsComponent } from "./compon/AccountComponent";
 import { SendComponent } from "./compon/SendComponent";
 import Navigation from "./compon/NavigationComponent";
-import { TransactionsComponent } from "./compon/TransactionComponent";
 import { CardsComponent } from "./compon/CardsComponent";
 import { SettingsComponent } from "./compon/SettingsCmponent";
+import TransactionsComponent from "./compon/TransactionComponent";
 
 
 const PredictiveAccount = () => {
@@ -57,11 +57,11 @@ const PredictiveAccount = () => {
     switch (activeTab) {
       case "accounts":
         return <AccountsComponent />;
-      case "send":
+      case "savings":
         return <SendComponent />;
       case "transactions":
         return <TransactionsComponent/>;
-      case "cards":
+      case "funds":
         return <CardsComponent />;
       case "settings":
         return <SettingsComponent />;

@@ -16,6 +16,15 @@ import {
     ExclamationTriangleIcon,
 } from "@heroicons/react/24/outline";
 
+interface TransactionDetails {
+    amount: number;
+    transactionId: string;
+    date: string;
+    time: string;
+    paymentMethod: string;
+    status: string;
+}
+
 export default function TopUpForm() {
     const navigate = useNavigate();
     const stripe = useStripe();
@@ -28,6 +37,10 @@ export default function TopUpForm() {
 
     // Predefined amounts for quick selection
     const quickAmounts = [10, 25, 50, 100, 250, 500];
+
+    const generateTransactionId = () => {
+        return 'TXN' + Date.now() + Math.random().toString(36).substr(2, 5).toUpperCase();
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -60,14 +73,42 @@ export default function TopUpForm() {
             toast.error("Card details not available.");
             return;
         }
+
+        if (cardError) {
+            toast.error("Please fix card details before proceeding.");
+            return;
+        }
     
         setLoading(true);
-        setCardError("");
         
         try {
             await topUp(stripe, cardElement, amountInDollar);
-            toast.success(`Successfully topped up $${amountInDollar.toFixed(2)}!`);
-            navigate('/dashboard');
+            
+            // Generate transaction details
+            const now = new Date();
+            const transactionDetails: TransactionDetails = {
+                amount: amountInDollar,
+                transactionId: generateTransactionId(),
+                date: now.toLocaleDateString('en-US', { 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                }),
+                time: now.toLocaleTimeString('en-US', { 
+                    hour: '2-digit', 
+                    minute: '2-digit',
+                    hour12: true 
+                }),
+                paymentMethod: "Credit/Debit Card ending in ****",
+                status: "Completed Successfully"
+            };
+
+            // Navigate to receipt page with transaction details
+            navigate('/receipt', { 
+                state: { transactionDetails },
+                replace: true 
+            });
+            
         } catch (err: any) {
             console.error('Top-up error:', err);
             toast.error(err.message || "Top-up failed. Please try again.");
