@@ -15,7 +15,9 @@ import {
   CurrencyDollarIcon,
   EyeIcon,
   ClipboardDocumentIcon,
-  CheckIcon
+  CheckIcon,
+  InformationCircleIcon,
+  ExclamationTriangleIcon
 } from '@heroicons/react/24/outline';
 
 interface SavingsData {
@@ -68,6 +70,19 @@ interface SavingDetail {
   transactions?: TransactionData[];
 }
 
+interface FoundGoalData {
+  id: string;
+  ref: string;
+  amount: number;
+  detail: string | null;
+  type: string;
+  status: string;
+  item_id: string | null;
+  user_ref_id: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export default function AllSavingsPage() {
   const { getSavingWallets, getAllWallets, createSavingsFundDeposit, getSavedFundByReferenceId } = UseFinanceHook();
   const navigate = useNavigate();
@@ -76,6 +91,7 @@ export default function AllSavingsPage() {
   const [loading, setLoading] = useState(true);
   const [depositLoading, setDepositLoading] = useState(false);
   const [viewLoading, setViewLoading] = useState(false);
+  const [searchingGoal, setSearchingGoal] = useState(false);
   const [filter, setFilter] = useState<'all' | 'active' | 'completed' | 'paused'>('all');
   const [sortBy, setSortBy] = useState<'date' | 'amount' | 'target' | 'progress'>('date');
   const [showDepositForm, setShowDepositForm] = useState(false);
@@ -83,6 +99,10 @@ export default function AllSavingsPage() {
   const [selectedSaving, setSelectedSaving] = useState<SavingsData | null>(null);
   const [savingDetail, setSavingDetail] = useState<SavingDetail | null>(null);
   const [copiedReference, setCopiedReference] = useState<string | null>(null);
+  const [isManualReference, setIsManualReference] = useState(false);
+  const [foundGoalData, setFoundGoalData] = useState<FoundGoalData[] | null>(null);
+  const [goalSearched, setGoalSearched] = useState(false);
+  const [tempReference, setTempReference] = useState('');
 
   // Form state
   const [depositForm, setDepositForm] = useState<SavingDepositValues>({
@@ -164,19 +184,86 @@ export default function AllSavingsPage() {
     return target > 0 ? Math.min((current / target) * 100, 100) : 0;
   };
 
-  const openDepositForm = (saving: SavingsData) => {
+  const searchGoalByReference = async (referenceId: string) => {
+    if (!referenceId.trim()) {
+      toast.error('Please enter a reference ID');
+      return;
+    }
+
+    try {
+      setSearchingGoal(true);
+      setGoalSearched(false);
+      setFoundGoalData(null);
+      
+      console.log('Searching for goal with reference:', referenceId);
+      // Convert string reference to number before calling the function
+      const numericRef = parseInt(referenceId, 10);
+      if (isNaN(numericRef)) {
+        throw new Error("Invalid reference format");
+      }
+      const response = await getSavedFundByReferenceId(numericRef);
+      console.log('Goal search response:', response);
+      
+      // Handle the response based on the API structure
+      let goalData: FoundGoalData[] = [];
+      if (Array.isArray(response)) {
+        goalData = response;
+      } else if (response?.data && Array.isArray(response.data)) {
+        goalData = response.data;
+      }
+      
+      setFoundGoalData(goalData);
+      setGoalSearched(true);
+      
+      if (goalData.length > 0) {
+        toast.success(`Found ${goalData.length} transaction(s) for this goal`);
+      } else {
+        toast.info('No transactions found for this reference ID, but you can still deposit to it');
+      }
+      
+    } catch (error: any) {
+      console.error('Error searching for goal:', error);
+      setFoundGoalData(null);
+      setGoalSearched(true);
+      
+      // Still allow deposit even if search fails
+      toast.warning('Could not fetch goal details, but you can still deposit to this reference ID');
+    } finally {
+      setSearchingGoal(false);
+    }
+  };
+
+  const openDepositForm = (saving?: SavingsData) => {
     const mainBalance = getMainAccountBalance();
     if (mainBalance <= 0) {
       toast.error('Insufficient funds in your main account');
       return;
     }
 
-    setDepositForm({
-      reference: saving.reference,
-      amount: 0,
-      detail: ''
-    });
-    setSelectedSaving(saving);
+    if (saving) {
+      setDepositForm({
+        reference: saving.reference,
+        amount: 0,
+        detail: ''
+      });
+      setSelectedSaving(saving);
+      setIsManualReference(false);
+      setFoundGoalData(null);
+      setGoalSearched(false);
+      setTempReference('');
+    } else {
+      // Open form for manual reference entry
+      setDepositForm({
+        reference: '',
+        amount: 0,
+        detail: ''
+      });
+      setSelectedSaving(null);
+      setIsManualReference(true);
+      setFoundGoalData(null);
+      setGoalSearched(false);
+      setTempReference('');
+    }
     setShowDepositForm(true);
   };
 
@@ -188,6 +275,10 @@ export default function AllSavingsPage() {
       detail: ''
     });
     setSelectedSaving(null);
+    setIsManualReference(false);
+    setFoundGoalData(null);
+    setGoalSearched(false);
+    setTempReference('');
   };
 
   const openViewModal = async (saving: SavingsData) => {
@@ -314,6 +405,11 @@ export default function AllSavingsPage() {
       toast.error('Please provide a description for this deposit');
       return;
     }
+
+    if (!depositForm.reference.trim()) {
+      toast.error('Please provide a reference ID');
+      return;
+    }
     
     try {
       setDepositLoading(true);
@@ -334,6 +430,27 @@ export default function AllSavingsPage() {
       ...prev,
       [field]: value
     }));
+  };
+
+  const handleReferenceSearch = () => {
+    if (tempReference.trim()) {
+      setDepositForm(prev => ({ ...prev, reference: tempReference.trim() }));
+      searchGoalByReference(tempReference.trim());
+    }
+  };
+
+  const getTotalGoalAmount = (goalData: FoundGoalData[]) => {
+    return goalData
+      .filter(item => item.status === 'approved' && item.type === 'deposit')
+      .reduce((sum, item) => sum + item.amount, 0);
+  };
+
+  const getGoalStats = (goalData: FoundGoalData[]) => {
+    const approved = goalData.filter(item => item.status === 'approved').length;
+    const pending = goalData.filter(item => item.status === 'pending').length;
+    const totalAmount = getTotalGoalAmount(goalData);
+    
+    return { approved, pending, totalAmount };
   };
 
   const copyReferenceToClipboard = async (reference: string) => {
@@ -397,13 +514,27 @@ export default function AllSavingsPage() {
                 💰 Main Account Balance: <span className="font-semibold">{formatCurrency(mainBalance)}</span>
               </p>
             </div>
-            <button 
-              onClick={() => navigate('/predictive-account?tab=savings')}
-              className="mt-4 sm:mt-0 inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              <PlusIcon className="w-4 h-4" />
-              Create New Goal
-            </button>
+            <div className="flex flex-wrap gap-2 mt-4 sm:mt-0">
+              <button 
+                onClick={() => openDepositForm()}
+                disabled={mainBalance <= 0}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-300 text-sm ${
+                  mainBalance > 0
+                    ? 'bg-green-100 text-green-700 hover:bg-green-200 shadow-md hover:shadow-lg transform hover:scale-105'
+                    : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                }`}
+              >
+                <CurrencyDollarIcon className="w-4 h-4" />
+                {mainBalance > 0 ? '💫 Deposit to Any Goal' : 'No Funds Available'}
+              </button>
+              <button 
+                onClick={() => navigate('/predictive-account?tab=savings')}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                <PlusIcon className="w-4 h-4" />
+                Create New Goal
+              </button>
+            </div>
           </div>
         </div>
 
@@ -611,14 +742,14 @@ export default function AllSavingsPage() {
         )}
       </div>
 
-      {/* Deposit Modal */}
-      {showDepositForm && selectedSaving && (
+      {/* Enhanced Deposit Modal with Goal Search */}
+      {showDepositForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full animate-scale-in">
+          <div className="bg-white rounded-lg shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto animate-scale-in">
             <div className="p-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold text-gray-900">
-                  Deposit to {selectedSaving.label}
+                  {isManualReference ? 'Deposit to Savings Goal' : `Deposit to ${selectedSaving?.label}`}
                 </h3>
                 <button
                   onClick={closeDepositForm}
@@ -640,15 +771,130 @@ export default function AllSavingsPage() {
               <form onSubmit={handleDepositSubmit} className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Reference ID
+                    Reference ID *
                   </label>
-                  <input
-                    type="text"
-                    value={depositForm.reference}
-                    readOnly
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-600 text-sm font-mono"
-                  />
+                  <div className="relative">
+                    {isManualReference ? (
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={tempReference}
+                          onChange={(e) => setTempReference(e.target.value)}
+                          className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          placeholder="Enter reference ID (e.g., REF123456)"
+                        />
+                        <button
+                          type="button"
+                          onClick={handleReferenceSearch}
+                          disabled={searchingGoal || !tempReference.trim()}
+                          className="px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors flex items-center gap-1"
+                        >
+                          {searchingGoal ? (
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                          ) : (
+                            <EyeIcon className="w-4 h-4" />
+                          )}
+                          {searchingGoal ? 'Searching...' : 'Preview'}
+                        </button>
+                      </div>
+                    ) : (
+                      <input
+                        type="text"
+                        value={depositForm.reference}
+                        readOnly
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-600 text-sm font-mono"
+                      />
+                    )}
+                  </div>
+                  {isManualReference && (
+                    <p className="text-xs text-gray-500 mt-1">
+                      💡 Enter the reference ID and click "Preview" to see goal details
+                    </p>
+                  )}
                 </div>
+
+                {/* Goal Search Results */}
+                {isManualReference && goalSearched && (
+                  <div className="border rounded-lg p-4 bg-gray-50">
+                    <h4 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
+                      <InformationCircleIcon className="w-4 h-4" />
+                      Goal Information for: {tempReference}
+                    </h4>
+                    
+                    {foundGoalData && foundGoalData.length > 0 ? (
+                      <div className="space-y-3">
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="bg-white p-3 rounded border">
+                            <p className="text-xs text-gray-500">Total Balance</p>
+                            <p className="text-sm font-semibold text-green-600">
+                              {formatCurrency(getGoalStats(foundGoalData).totalAmount)}
+                            </p>
+                          </div>
+                          <div className="bg-white p-3 rounded border">
+                            <p className="text-xs text-gray-500">Transactions</p>
+                            <p className="text-sm font-semibold text-blue-600">
+                              {foundGoalData.length} total
+                            </p>
+                          </div>
+                        </div>
+                        
+                        <div className="bg-white p-3 rounded border">
+                          <p className="text-xs text-gray-500 mb-2">Recent Transactions</p>
+                          <div className="space-y-2 max-h-32 overflow-y-auto">
+                            {foundGoalData.slice(0, 3).map((transaction, index) => (
+                              <div key={index} className="flex justify-between items-center text-xs">
+                                <span className="flex items-center gap-2">
+                                  <span className={`w-2 h-2 rounded-full ${
+                                    transaction.status === 'approved' ? 'bg-green-500' : 
+                                    transaction.status === 'pending' ? 'bg-yellow-500' : 'bg-red-500'
+                                  }`}></span>
+                                  {formatDate(transaction.created_at)}
+                                </span>
+                                <span className="font-medium">
+                                  {formatCurrency(transaction.amount)}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                        
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setDepositForm(prev => ({ ...prev, reference: tempReference }));
+                            toast.success('Reference ID confirmed! You can now proceed with your deposit.');
+                          }}
+                          className="w-full py-2 bg-green-100 text-green-700 rounded-md hover:bg-green-200 transition-colors text-sm font-medium"
+                        >
+                          ✓ Use This Reference ID
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="bg-yellow-50 border border-yellow-200 rounded p-3">
+                        <div className="flex items-start gap-2">
+                          <ExclamationTriangleIcon className="w-4 h-4 text-yellow-600 mt-0.5 flex-shrink-0" />
+                          <div>
+                            <p className="text-sm text-yellow-700 font-medium">No transactions found</p>
+                            <p className="text-xs text-yellow-600 mt-1">
+                              This reference ID doesn't have any existing transactions, but you can still deposit to it. 
+                              The goal might be new or belong to another user.
+                            </p>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setDepositForm(prev => ({ ...prev, reference: tempReference }));
+                                toast.info('Reference ID set! You can proceed with your deposit.');
+                              }}
+                              className="mt-2 py-1 px-3 bg-yellow-100 text-yellow-700 rounded text-xs hover:bg-yellow-200 transition-colors"
+                            >
+                              Use Anyway
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -684,10 +930,18 @@ export default function AllSavingsPage() {
                     onChange={(e) => handleInputChange('detail', e.target.value)}
                     rows={3}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="Add a note about this deposit..."
+                    placeholder={isManualReference ? "Contributing to your savings goal..." : "Add a note about this deposit..."}
                     required
                   />
                 </div>
+
+                {isManualReference && (
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                    <p className="text-xs text-yellow-700">
+                      <strong>Note:</strong> Make sure the reference ID is correct. The deposit will be processed even if the goal doesn't exist in your account.
+                    </p>
+                  </div>
+                )}
 
                 <div className="flex gap-3 pt-4">
                   <button
@@ -703,7 +957,8 @@ export default function AllSavingsPage() {
                       depositLoading || 
                       depositForm.amount <= 0 || 
                       depositForm.amount > mainBalance || 
-                      !depositForm.detail.trim()
+                      !depositForm.detail.trim() ||
+                      !depositForm.reference.trim()
                     }
                     className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
                   >

@@ -5,7 +5,7 @@ import CurrencyConverter from './CurrencyConverter';
 import CurrencyRates from './CurrencyRate';
 import UseFinanceHook from '@/hooks/UseFinance';
 import { toast } from 'react-toastify';
-import { ArrowRightIcon, BanknotesIcon, PlusIcon } from '@heroicons/react/24/outline';
+import { ArrowRightIcon, BanknotesIcon} from '@heroicons/react/24/outline';
 
 interface WalletData {
   balance: number;
@@ -118,13 +118,7 @@ export const AccountsComponent: React.FC = () => {
           View All ({wallets.length})
         </button>
           
-          <button
-        onClick={() => navigate('/predictive-account?tab=savings')}
-        className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm sm:text-base"
-          >
-        <PlusIcon className="w-4 h-4" />
-        Add Account
-          </button>
+        
         </div>
       </div>
       

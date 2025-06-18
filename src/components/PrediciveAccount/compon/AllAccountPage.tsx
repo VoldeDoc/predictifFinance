@@ -337,7 +337,7 @@ export default function AllAccountsPage() {
                   </div>
                   
                   {/* Hover Actions */}
-                  <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
+                  {/* <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
                     <div className="flex gap-2">
                       <button className="bg-white text-gray-900 px-3 py-1 rounded text-xs font-medium hover:bg-gray-100">
                         View Details
@@ -346,7 +346,7 @@ export default function AllAccountsPage() {
                         Manage
                       </button>
                     </div>
-                  </div>
+                  </div> */}
                 </div>
               );
             })}
